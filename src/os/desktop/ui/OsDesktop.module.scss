@@ -1,0 +1,200 @@
+@use 'mixins' as *;
+
+.desktop {
+  position: absolute;
+  inset: 0 0 40px 0;
+  background: var(--desktop);
+  @include padding($all: 20);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 108px);
+  grid-auto-rows: 116px;
+  gap: 6px;
+  align-content: start;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle at 4px 4px,
+      color-mix(in srgb, var(--desktop) 60%, white 12%) 1px,
+      transparent 1.5px
+    );
+    background-size: 16px 16px;
+    pointer-events: none;
+    opacity: 0.35;
+  }
+
+  > * {
+    position: relative;
+  }
+}
+
+.icon {
+  cursor: default;
+  user-select: none;
+
+  &.comingSoon {
+    opacity: 0.55;
+  }
+
+  &.selected .iconInner {
+    background: var(--select);
+    outline: 1px dotted var(--titlebar-fg);
+    outline-offset: -1px;
+    z-index: 10;
+  }
+
+  &.selected .labelKo {
+    text-shadow: none;
+    -webkit-line-clamp: unset;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+.iconInner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  @include flex($direction: column, $align: center, $gap: 6);
+  @include padding($top: 10, $bottom: 8, $x: 4);
+  color: var(--titlebar-fg);
+  font-family: 'Mona', monospace;
+  @include font($size: 13);
+  text-align: center;
+  line-height: 1.15;
+  z-index: 1;
+
+  img {
+    @include size($width: 48, $height: 48);
+    image-rendering: pixelated;
+  }
+}
+
+.labelEn {
+  font-family: 'Mona Small', 'Mona', monospace;
+  @include font($size: 11);
+  opacity: 0.8;
+  padding: 1px 4px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.labelKo {
+  padding: 1px 4px;
+  text-shadow: 1px 1px 0 #000;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: calc(3 * 1.15em);
+  clip-path: inset(0);
+}
+
+@keyframes stickyFadeOut {
+  from {
+    opacity: 1;
+    transform: rotate(-1.5deg) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(-1.5deg) scale(0.92);
+  }
+}
+
+.sticky {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 260px;
+  background: #fff6a8;
+  color: #3a2a14;
+  @include padding($top: 20, $bottom: 22, $x: 18);
+  box-shadow: 4px 4px 0 0 var(--bevel-xlo);
+  font-family: 'Mona', monospace;
+  @include font($size: 14);
+  line-height: 1.55;
+  z-index: 1;
+  transform: rotate(-1.5deg);
+
+  &.closing {
+    animation: stickyFadeOut 200ms ease-in forwards;
+    pointer-events: none;
+  }
+
+  b {
+    display: block;
+    margin-bottom: 8px;
+    @include font($size: 17);
+  }
+
+  .dim {
+    color: #6a4a14;
+    @include font($size: 12);
+  }
+}
+
+.stickyClose {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  @include size($width: 22, $height: 22);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: 'Mona', monospace;
+  @include font($size: 16, $weight: 700);
+  line-height: 1;
+  color: #6a4a14;
+  cursor: pointer;
+
+  &:hover {
+    color: #3a2a14;
+    background: rgba(0, 0, 0, 0.06);
+  }
+}
+
+@include mobile {
+  .desktop {
+    inset: 0 0 48px 0;
+    @include padding($all: 14);
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    grid-auto-rows: 108px;
+    gap: 8px;
+  }
+
+  .iconInner {
+    @include font($size: 14);
+    @include padding($top: 10, $bottom: 0, $x: 4);
+    gap: 8px;
+
+    img {
+      @include size($width: 56, $height: 56);
+    }
+  }
+
+  .sticky {
+    width: 200px;
+    top: 14px;
+    right: 14px;
+    @include padding($top: 16, $bottom: 18, $x: 14);
+    @include font($size: 13);
+
+    b {
+      @include font($size: 15);
+    }
+  }
+}
+
+@include mobile-xs {
+  .sticky {
+    display: none;
+  }
+
+  .desktop {
+    @include padding($all: 10);
+  }
+}

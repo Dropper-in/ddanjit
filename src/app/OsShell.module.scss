@@ -1,0 +1,65 @@
+@use 'mixins' as *;
+
+.appFrame {
+  position: absolute;
+  top: 24px;
+  bottom: 52px;
+  display: flex;
+  z-index: 20;
+}
+
+@media (max-width: 768px) {
+  .appFrame {
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    bottom: 48px !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+.appFrameNarrow {
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: min(calc((100vh - 76px) * 4 / 3), calc(100vw - 48px), 720px);
+}
+
+.appFrameWide {
+  left: 24px;
+  right: 24px;
+}
+
+// 전체화면 앱 — 작업표시줄(50)·시작메뉴(100) 위, 시스템 다이얼로그(200) 아래
+.appFullscreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  z-index: 150;
+}
+
+.dialogBody {
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+.dialogNote {
+  color: var(--ink-dim);
+  font-size: 10px;
+}
+
+.spectrumList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 240px;
+}
+
+.spectrumItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+}

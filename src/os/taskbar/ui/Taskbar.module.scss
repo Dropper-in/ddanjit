@@ -1,0 +1,289 @@
+@use 'mixins' as *;
+
+.taskbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  background: var(--chrome);
+  box-shadow: var(--bevel-out);
+  @include flex($align: center, $gap: 6);
+  @include padding($all: 4);
+  z-index: 50;
+}
+
+.start {
+  background: var(--chrome);
+  box-shadow: var(--bevel-out);
+  @include padding($y: 4, $x: 14);
+  @include flex($align: center, $gap: 6);
+  font-family: 'Mona', monospace;
+  @include font($size: 14, $weight: 700);
+  cursor: default;
+  height: 32px;
+
+  img {
+    @include size($width: 20, $height: 20);
+  }
+
+  &:active,
+  &.open {
+    box-shadow: var(--bevel-in);
+  }
+}
+
+.task {
+  background: var(--chrome);
+  box-shadow: var(--bevel-out);
+  @include padding($y: 4, $x: 12);
+  @include flex($align: center, $gap: 8);
+  font-family: 'Mona', monospace;
+  @include font($size: 13);
+  min-width: 180px;
+  max-width: 240px;
+  height: 32px;
+  cursor: default;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  img {
+    @include size($width: 18, $height: 18);
+  }
+
+  &.active {
+    box-shadow: var(--bevel-in);
+    background: var(--chrome);
+  }
+
+  > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 4px;
+  }
+}
+
+.tray {
+  margin-left: auto;
+  box-shadow: var(--bevel-in);
+  @include padding($y: 4, $x: 14);
+  font-family: 'Mona', monospace;
+  @include font($size: 13);
+  height: 32px;
+  @include flex($align: center);
+}
+
+.startmenu {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 0;
+  width: auto;
+  background: var(--chrome);
+  box-shadow:
+    var(--bevel-out),
+    2px 2px 0 0 var(--bevel-xlo);
+  padding: 3px;
+  z-index: 100;
+  @include flex;
+}
+
+.strip {
+  flex: 0 0 36px;
+  align-self: stretch;
+  background: linear-gradient(180deg, var(--titlebar), var(--titlebar-2));
+  color: var(--titlebar-fg);
+  @include flex($align: flex-end, $justify: center);
+  @include padding($y: 14);
+  overflow: hidden;
+
+  span {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-family: 'Mona', monospace;
+    @include font($size: 17, $weight: 700);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    line-height: 1;
+
+    b {
+      color: var(--accent-yellow);
+    }
+  }
+}
+
+.items {
+  flex: 1;
+  @include flex($direction: column);
+}
+
+.row {
+  @include flex($align: center, $gap: 8);
+  @include padding($top: 6, $bottom: 6, $left: 8, $right: 16);
+  cursor: default;
+
+  &:hover {
+    background: var(--select);
+    color: var(--select-fg);
+  }
+
+  img {
+    @include size($width: 24, $height: 24);
+    image-rendering: pixelated;
+  }
+}
+
+.meta {
+  @include flex($direction: column);
+  line-height: 1.2;
+  gap: 2px;
+
+  b {
+    @include font($size: 13, $weight: 700);
+    white-space: nowrap;
+  }
+}
+
+.sub {
+  @include font($size: 11);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.row:hover .sub {
+  opacity: 1;
+}
+
+.sectionLabel {
+  font-family: 'Mona Small', 'Mona', monospace;
+  @include font($size: 10);
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  @include padding($top: 8, $bottom: 4, $left: 16, $right: 12);
+}
+
+.sep {
+  height: 0;
+  border-top: 1px solid var(--bevel-lo);
+  border-bottom: 1px solid var(--bevel-hi);
+  margin: 2px 4px;
+}
+
+.attribution {
+  @include font($size: 10);
+  color: var(--ink-dim);
+  text-align: center;
+  @include padding($y: 6, $x: 8);
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+@include mobile {
+  .taskbar {
+    height: 48px;
+    @include padding($all: 4);
+    gap: 4px;
+  }
+
+  .start,
+  .task,
+  .tray {
+    height: 36px;
+  }
+
+  .start {
+    @include padding($y: 4, $x: 12);
+    @include font($size: 14);
+
+    img {
+      @include size($width: 20, $height: 20);
+    }
+  }
+
+  .task {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    @include padding($y: 4, $x: 10);
+    @include font($size: 13);
+
+    img {
+      @include size($width: 22, $height: 22);
+    }
+  }
+
+  .tray {
+    @include font($size: 14);
+    @include padding($y: 4, $x: 14);
+  }
+
+  .startmenu {
+    left: 0;
+    right: 0;
+    width: 100%;
+    flex-direction: column;
+
+    .strip {
+      flex: none;
+      width: 100%;
+      align-self: auto;
+      writing-mode: horizontal-tb;
+      flex-direction: row;
+      justify-content: flex-start;
+      @include padding($y: 8, $x: 12);
+      gap: 6px;
+
+      span {
+        writing-mode: horizontal-tb;
+        text-orientation: mixed;
+        letter-spacing: 2px;
+        @include font($size: 15, $weight: 700);
+      }
+    }
+
+    .items {
+      width: 100%;
+    }
+
+    .row {
+      @include padding($top: 10, $bottom: 10, $left: 10, $right: 14);
+      gap: 12px;
+      min-width: 0;
+
+      img {
+        @include size($width: 32, $height: 32);
+        flex-shrink: 0;
+      }
+    }
+
+    .meta {
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .meta b {
+      @include font($size: 14);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sub {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}

@@ -1,0 +1,79 @@
+.t-display {
+  font-family: 'Mona', monospace;
+  font-weight: 700;
+  font-size: var(--t-4xl);
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.t-h1 {
+  font-family: 'Mona', monospace;
+  font-weight: 700;
+  font-size: var(--t-3xl);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.t-h2 {
+  font-family: 'Mona', monospace;
+  font-weight: 700;
+  font-size: var(--t-2xl);
+  line-height: 1.1;
+}
+
+.t-h3 {
+  font-family: 'Mona', monospace;
+  font-weight: 700;
+  font-size: var(--t-xl);
+  line-height: 1.15;
+}
+
+.t-h4 {
+  font-family: 'Mona', monospace;
+  font-weight: 700;
+  font-size: var(--t-lg);
+  line-height: 1.2;
+}
+
+.t-body {
+  font-family: 'Mona', monospace;
+  font-weight: 400;
+  font-size: var(--t-md);
+  line-height: var(--line-prose);
+}
+
+.t-ui {
+  font-family: 'Mona', monospace;
+  font-weight: 400;
+  font-size: var(--t-sm);
+  line-height: 1;
+}
+
+.t-ui-bold {
+  font-family: 'Mona', monospace;
+  font-weight: 700;
+  font-size: var(--t-sm);
+  line-height: 1;
+}
+
+.t-caption {
+  font-family: 'Mona Small', 'Mona', monospace;
+  font-weight: 400;
+  font-size: var(--t-xs);
+  line-height: 1.1;
+  color: var(--ink-dim);
+}
+
+.t-mono {
+  font-family: 'Mona', monospace;
+  font-size: var(--t-sm);
+  background: var(--paper);
+  box-shadow: var(--bevel-in);
+  padding: 2px 4px;
+}
+
+h1 {
+  @extend .t-h1;
+}

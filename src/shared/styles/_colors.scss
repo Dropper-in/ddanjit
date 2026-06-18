@@ -1,0 +1,127 @@
+:root {
+  --desktop: #0a8c8c;
+  --chrome: #cdc7bd;
+  --chrome-2: #ddd6c8;
+  --bevel-hi: #fffaee;
+  --bevel-lo: #807a6e;
+  --bevel-xlo: #1a1610;
+  --titlebar: #1a2890;
+  --titlebar-2: #2c84cc;
+  --titlebar-inactive: #8a8478;
+  --titlebar-fg: #fffaee;
+  --ink: #1a1610;
+  --ink-dim: #4a443a;
+  --paper: #fffaee;
+  --select: #1a2890;
+  --select-fg: #fffaee;
+  --link: #0a0aee;
+  --link-visited: #551a8b;
+  --shadow-drop: 2px 2px 0 #1a1610;
+
+  --accent-red: #ff0000;
+  --accent-yellow: #ffff00;
+  --accent-green: #00ff00;
+  --accent-cyan: #00ffff;
+  --accent-magenta: #ff00ff;
+  --accent-blue: #0000ff;
+}
+
+[data-theme='cream'] {
+  --desktop: #2a2419;
+  --chrome: #f0d97a;
+  --chrome-2: #f7e69b;
+  --bevel-hi: #fff6c8;
+  --bevel-lo: #8a6a2a;
+  --bevel-xlo: #3a2a14;
+  --titlebar: #b88a3a;
+  --titlebar-2: #d8a958;
+  --titlebar-inactive: #b89e6a;
+  --titlebar-fg: #fff6dc;
+  --ink: #3a2a14;
+  --ink-dim: #6b4f28;
+  --paper: #fff6c8;
+  --select: #b88a3a;
+  --select-fg: #fff6dc;
+  --link: #5a3a14;
+  --link-visited: #8a6a2a;
+}
+
+[data-theme='gameboy'] {
+  --desktop: #0f380f;
+  --chrome: #8bac0f;
+  --chrome-2: #9bbc0f;
+  --bevel-hi: #9bbc0f;
+  --bevel-lo: #306230;
+  --bevel-xlo: #0f380f;
+  --titlebar: #306230;
+  --titlebar-2: #4a7c2a;
+  --titlebar-inactive: #6b8f4a;
+  --titlebar-fg: #9bbc0f;
+  --ink: #0f380f;
+  --ink-dim: #306230;
+  --paper: #9bbc0f;
+  --select: #0f380f;
+  --select-fg: #9bbc0f;
+  --link: #0f380f;
+  --link-visited: #306230;
+}
+
+[data-theme='crt'] {
+  --desktop: #000000;
+  --chrome: #001a00;
+  --chrome-2: #002a00;
+  --bevel-hi: #00ff66;
+  --bevel-lo: #00aa44;
+  --bevel-xlo: #003311;
+  --titlebar: #003311;
+  --titlebar-2: #006622;
+  --titlebar-inactive: #002211;
+  --titlebar-fg: #00ff66;
+  --ink: #00ff66;
+  --ink-dim: #00aa44;
+  --paper: #001100;
+  --select: #00ff66;
+  --select-fg: #000000;
+  --link: #66ffaa;
+  --link-visited: #00aa44;
+}
+
+[data-theme='bubblegum'] {
+  --desktop: #ff9ec7;
+  --chrome: #ffd6e8;
+  --chrome-2: #ffe7f1;
+  --bevel-hi: #ffffff;
+  --bevel-lo: #c46a99;
+  --bevel-xlo: #6a2a4a;
+  --titlebar: #d23a7a;
+  --titlebar-2: #ff6aa8;
+  --titlebar-inactive: #c896aa;
+  --titlebar-fg: #fff0f6;
+  --ink: #4a1a2e;
+  --ink-dim: #8a3a5a;
+  --paper: #fff0f6;
+  --select: #d23a7a;
+  --select-fg: #fff0f6;
+  --link: #6a2a4a;
+  --link-visited: #8a3a5a;
+}
+
+[data-theme='blueprint'] {
+  --desktop: #1a3a6a;
+  --chrome: #6a8acc;
+  --chrome-2: #88a4dd;
+  --bevel-hi: #d6e2f5;
+  --bevel-lo: #2a4a8a;
+  --bevel-xlo: #0a1a3a;
+  --titlebar: #0a1a4a;
+  --titlebar-2: #2a3a7a;
+  --titlebar-inactive: #4a5a8a;
+  --titlebar-fg: #d6e2f5;
+  --ink: #0a1a3a;
+  --ink-dim: #2a3a6a;
+  --paper: #d6e2f5;
+  --select: #0a1a4a;
+  --select-fg: #d6e2f5;
+  --link: #0a1a4a;
+  --link-visited: #2a3a6a;
+}

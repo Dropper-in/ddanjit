@@ -1,0 +1,9 @@
+@use 'sass:meta';
+@use 'sass:math';
+
+@function to-unit($value) {
+  @if meta.type-of($value) == 'number' and math.is-unitless($value) and $value != 0 {
+    @return #{$value}px;
+  }
+  @return $value;
+}

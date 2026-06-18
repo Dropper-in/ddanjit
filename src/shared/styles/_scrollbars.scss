@@ -1,0 +1,34 @@
+// Pixel scrollbars — sunken trough + raised thumb, spectrum-driven.
+// NOTE: deliberately NO scrollbar-color / scrollbar-width — Chrome ignores
+// ::-webkit-scrollbar rules the moment either property is set.
+// Firefox keeps its native scrollbar (acceptable trade-off).
+
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--chrome);
+  box-shadow:
+    inset 1px 1px 0 0 var(--bevel-xlo),
+    inset -1px -1px 0 0 var(--bevel-hi),
+    inset 2px 2px 0 0 var(--bevel-lo),
+    inset -2px -2px 0 0 var(--chrome-2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--chrome);
+  box-shadow: var(--bevel-out);
+  min-height: 28px;
+  min-width: 28px;
+}
+
+::-webkit-scrollbar-thumb:active {
+  box-shadow: var(--bevel-in);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--chrome);
+  box-shadow: var(--bevel-in);
+}

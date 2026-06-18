@@ -1,0 +1,706 @@
+@use 'mixins' as *;
+
+// CRT 테마: dd-x 버튼 색상 오버라이드 (_components.scss에서 이동)
+[data-theme='crt'] .dd-x {
+  color: var(--ink);
+}
+
+// ============================================================
+// APP: 딴짓.txt (daydream / tangent)
+// ============================================================
+.dd-app {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--chrome);
+}
+
+.dd-input-row {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px solid var(--bevel-lo);
+  background: var(--chrome);
+  flex: 0 0 auto;
+}
+
+.dd-input-compact {
+  .dd-input-controls-row {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .dd-input-side {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 130px;
+    flex: 0 0 auto;
+    align-self: flex-start;
+
+    select,
+    .rpp-menubtn,
+    .rpp-menubtn-trigger,
+    .dd-newtag-input {
+      flex: 0 0 auto;
+      height: 32px;
+      width: 100%;
+    }
+
+    .rpp-btn {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+}
+
+.dd-newtag-input {
+  box-sizing: border-box;
+}
+
+.dd-input-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+
+  .dim {
+    font-weight: 400;
+    color: var(--ink-dim);
+    font-size: 10px;
+  }
+}
+
+.dd-textarea {
+  width: 100%;
+  resize: none;
+  min-height: 32px;
+  padding: 6px;
+  font-family: 'Mona', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  flex: 1;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.dd-hero {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+  background: var(--paper);
+  box-shadow: var(--bevel-in);
+  margin: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dd-hero-decor {
+  font-family: 'Mona Emoji', 'Apple Color Emoji', sans-serif;
+  font-size: 64px;
+  line-height: 1;
+  opacity: 0.35;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dd-hero-title {
+  font-family: 'Mona', monospace;
+  font-size: 16px;
+  text-align: center;
+  line-height: 1.5;
+
+  b {
+    font-size: 28px;
+    color: var(--titlebar);
+  }
+}
+
+.rpp-btn.dd-hero-cta {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px 28px;
+  min-width: 240px;
+  gap: 10px;
+
+  &:active {
+    padding-top: 15px;
+    padding-left: 29px;
+    padding-bottom: 13px;
+    padding-right: 27px;
+  }
+}
+
+.dd-list-toggle {
+  background: transparent;
+  border: 0;
+  font-family: 'Mona', monospace;
+  font-size: 12px;
+  color: var(--ink-dim);
+  cursor: default;
+  padding: 4px 8px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: var(--ink);
+  }
+}
+
+.dd-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--chrome);
+  box-shadow:
+    inset 0 -1px 0 0 var(--bevel-lo),
+    inset 0 1px 0 0 var(--bevel-hi);
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.dd-toolbar-label {
+  font-size: 11px;
+  margin-right: 4px;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dd-tagbtn {
+  font-family: 'Mona', monospace;
+  font-size: 11px;
+  background: var(--chrome);
+  box-shadow: var(--bevel-thin);
+  border: 0;
+  padding: 2px 8px;
+  cursor: default;
+
+  &.selected {
+    box-shadow: var(--bevel-in);
+    background: var(--paper);
+  }
+}
+
+.dd-back {
+  margin-right: 8px;
+  font-weight: 700;
+  color: var(--ink) !important;
+}
+
+.rpp-btn.dd-mini-random {
+  font-weight: 700;
+}
+
+.dd-list {
+  flex: 1;
+  min-height: 200px;
+  overflow-y: auto;
+  background: var(--paper);
+  box-shadow: var(--bevel-in);
+  margin: 4px 8px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dd-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--ink-dim);
+  text-align: center;
+  padding: 20px;
+
+  img {
+    image-rendering: pixelated;
+    opacity: 0.6;
+  }
+
+  .dim {
+    font-size: 10px;
+    opacity: 0.7;
+  }
+}
+
+.dd-entry {
+  background: var(--paper);
+  box-shadow: var(--bevel-thin);
+  padding: 6px 8px;
+  font-family: 'Mona', monospace;
+  font-size: 12px;
+
+  .dim {
+    color: var(--ink-dim);
+  }
+}
+
+.dd-entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.dd-tag-chip {
+  display: inline-block;
+  padding: 1px 6px;
+  background: var(--titlebar);
+  color: var(--titlebar-fg);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.dd-entry-text {
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.dd-x {
+  background: var(--chrome);
+  box-shadow: var(--bevel-out);
+  border: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  .ctrl-glyph {
+    width: 10px;
+    height: 10px;
+  }
+
+  &:active {
+    box-shadow: var(--bevel-in);
+  }
+}
+
+// ============================================================
+// APP: 사랑하는아이에게돌을던져보세요...exe (stones)
+// ============================================================
+.st-app {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--chrome);
+}
+
+.st-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--chrome);
+  box-shadow:
+    inset 0 -1px 0 0 var(--bevel-lo),
+    inset 0 1px 0 0 var(--bevel-hi);
+  flex: 0 0 auto;
+}
+
+.st-toolbar-label {
+  font-size: 11px;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  .dim {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+}
+
+.st-ammo-row {
+  display: flex;
+  gap: 2px;
+}
+
+.st-ammo-btn {
+  font-family: 'Mona', monospace;
+  font-size: 11px;
+  background: var(--chrome);
+  color: var(--ink);
+  box-shadow: var(--bevel-out);
+  border: 0;
+  padding: 3px 8px;
+  cursor: default;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &.selected {
+    box-shadow: var(--bevel-in);
+    padding-top: 4px;
+    padding-left: 9px;
+    padding-bottom: 2px;
+    padding-right: 7px;
+  }
+
+  img {
+    image-rendering: pixelated;
+  }
+}
+
+.st-upload {
+  display: inline-block;
+}
+
+.st-stage {
+  flex: 1;
+  min-height: 240px;
+  background: var(--paper);
+  box-shadow: var(--bevel-in);
+  margin: 4px 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.st-target {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 60ms steps(2);
+
+  > div:not(.st-reaction),
+  > div:not(.st-reaction) > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.st-character {
+  width: 70%;
+  height: 70%;
+  image-rendering: pixelated;
+  user-select: none;
+  -webkit-user-drag: none;
+  object-fit: contain;
+}
+
+.st-action-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--chrome);
+  box-shadow: inset 0 1px 0 0 var(--bevel-hi);
+  flex: 0 0 auto;
+
+  .st-throw {
+    flex: 1;
+  }
+}
+
+.rpp-btn.st-throw {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 12px 24px;
+  min-width: 0;
+
+  &:active {
+    padding-top: 13px;
+    padding-left: 25px;
+    padding-bottom: 11px;
+    padding-right: 23px;
+  }
+}
+
+.st-stuck {
+  position: absolute;
+  pointer-events: none;
+  image-rendering: pixelated;
+  width: 16px;
+  height: 16px;
+}
+
+.st-reaction {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--paper);
+  box-shadow: var(--bevel-thin);
+  border: 1px solid var(--ink);
+  padding: 4px 8px;
+  font-family: 'Mona', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  animation: st-pop 200ms steps(2);
+}
+
+@keyframes st-pop {
+  from {
+    transform: scale(0.8);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.st-hint {
+  font-family: 'Mona Small', 'Mona', monospace;
+  font-size: 11px;
+  color: var(--ink-dim);
+  text-align: center;
+  padding: 0 12px 12px;
+  background: var(--chrome);
+  flex: 0 0 auto;
+}
+
+.st-slider-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.st-slider {
+  width: 100px;
+}
+
+.rpp-btn.is-recording {
+  background: var(--accent-red);
+  color: var(--paper);
+
+  &::before {
+    content: '●';
+    margin-right: 4px;
+    animation: rec-blink 1s steps(2) infinite;
+  }
+}
+
+@keyframes rec-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+// Custom ammo dropdown (mobile only) — trigger는 native select와 동일 (paper + bevel-in)
+.st-ammo-dropdown {
+  display: none;
+  position: relative;
+}
+
+.st-ammo-trigger {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--bevel-in);
+  border: 0;
+  height: 32px;
+  padding: 0 24px 0 8px;
+  font-family: 'Mona', monospace;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+  position: relative;
+  min-width: 160px;
+  text-align: left;
+  white-space: nowrap;
+
+  img {
+    image-rendering: pixelated;
+    flex: 0 0 auto;
+  }
+
+  .caret {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    pointer-events: none;
+  }
+
+  .dim {
+    color: var(--ink-dim);
+  }
+}
+
+.st-ammo-trigger-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st-ammo-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow:
+    var(--bevel-out),
+    2px 2px 0 0 var(--bevel-xlo);
+  padding: 2px;
+  z-index: 50;
+  min-width: 200px;
+  font-family: 'Mona', monospace;
+  font-size: 13px;
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    cursor: default;
+    white-space: nowrap;
+
+    &:hover {
+      background: var(--select);
+      color: var(--select-fg);
+
+      .dim {
+        color: var(--select-fg);
+        opacity: 0.85;
+      }
+    }
+
+    &.selected {
+      font-weight: 700;
+    }
+
+    img {
+      image-rendering: pixelated;
+    }
+  }
+
+  .dim {
+    margin-left: auto;
+    opacity: 0.7;
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+}
+
+// ============================================================
+// Mobile patches
+// ============================================================
+@include mobile {
+  .st-toolbar .st-ammo-row {
+    display: none;
+  }
+
+  .st-ammo-dropdown {
+    display: inline-block;
+  }
+
+  .st-ammo-trigger {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .st-ammo-trigger-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .st-action-bar {
+    flex-wrap: wrap;
+    gap: 6px;
+
+    // 던지기 단독 상단 줄, 초기화 + 녹화는 하단 줄 분할
+    .st-throw {
+      flex: 1 1 100%;
+      order: -1;
+    }
+
+    > .rpp-btn:not(.st-throw) {
+      flex: 1 1 calc(50% - 3px);
+      min-width: 0;
+      padding: 8px 6px;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .st-slider-label {
+    flex: 1 1 100%;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .st-slider {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .dd-textarea {
+    min-height: 64px;
+    font-size: 14px;
+  }
+
+  .dd-tagbtn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .dd-entry {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .dd-entry-meta {
+    font-size: 11px;
+  }
+
+  .dd-x {
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
+  }
+
+  .st-ammo-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+
+    img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .st-stuck {
+    width: 22px;
+    height: 22px;
+  }
+
+  .st-slider {
+    width: 80px;
+  }
+}

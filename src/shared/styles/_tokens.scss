@@ -1,0 +1,42 @@
+:root {
+  // Pixel grid — everything snaps to 2/4/8/16/24
+  --px: 1px;
+  --s-1: 2px;
+  --s-2: 4px;
+  --s-3: 8px;
+  --s-4: 12px;
+  --s-5: 16px;
+  --s-6: 24px;
+  --s-7: 32px;
+  --s-8: 48px;
+
+  // Pixel art has no radius
+  --radius: 0;
+
+  // Type scale — integer multiples of 12 for Mona crispness
+  --t-xs: 10px;
+  --t-sm: 12px;
+  --t-md: 16px;
+  --t-lg: 20px;
+  --t-xl: 24px;
+  --t-2xl: 32px;
+  --t-3xl: 48px;
+  --t-4xl: 72px;
+
+  --line: 1.15;
+  --line-prose: 1.4;
+
+  // Bevel system — entire visual language is 2px box-shadow bevels
+  // Outset: raised button. Inset: sunken (input fields, canvas).
+  --bevel-out:
+    inset -1px -1px 0 0 var(--bevel-xlo), inset 1px 1px 0 0 var(--bevel-hi),
+    inset -2px -2px 0 0 var(--bevel-lo), inset 2px 2px 0 0 var(--chrome-2);
+
+  --bevel-in:
+    inset 1px 1px 0 0 var(--bevel-xlo), inset -1px -1px 0 0 var(--bevel-hi),
+    inset 2px 2px 0 0 var(--bevel-lo), inset -2px -2px 0 0 var(--chrome-2);
+
+  --bevel-thin: inset -1px -1px 0 0 var(--bevel-lo), inset 1px 1px 0 0 var(--bevel-hi);
+
+  --window-shadow: 2px 2px 0 0 var(--bevel-xlo);
+}

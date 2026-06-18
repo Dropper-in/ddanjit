@@ -1,0 +1,29 @@
+@use './utils' as *;
+
+@mixin size(
+  $width: null,
+  $height: null,
+  $min-width: null,
+  $max-width: null,
+  $min-height: null,
+  $max-height: null
+) {
+  @if $width != null {
+    width: to-unit($width);
+  }
+  @if $height != null {
+    height: to-unit($height);
+  }
+  @if $min-width != null {
+    min-width: to-unit($min-width);
+  }
+  @if $max-width != null {
+    max-width: to-unit($max-width);
+  }
+  @if $min-height != null {
+    min-height: to-unit($min-height);
+  }
+  @if $max-height != null {
+    max-height: to-unit($max-height);
+  }
+}

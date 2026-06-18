@@ -1,0 +1,48 @@
+@use 'mixins' as *;
+
+// Checkbox / Radio 공통 — Win98 스타일 fake box/dot + native input 숨김
+.check,
+.radio {
+  @include flex($align: center, $gap: 6);
+  font-family: 'Mona', monospace;
+  @include font($size: 12);
+  cursor: default;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+.box {
+  @include size($width: 13, $height: 13);
+  background: var(--paper);
+  box-shadow: var(--bevel-in);
+  @include flex($align: center, $justify: center);
+  @include font($size: 11, $weight: 700);
+  flex-shrink: 0;
+}
+
+.dot {
+  @include size($width: 13, $height: 13);
+  background: var(--paper);
+  box-shadow: var(--bevel-in);
+  border-radius: 50%;
+  @include flex($align: center, $justify: center);
+  flex-shrink: 0;
+
+  &.on::after {
+    content: '';
+    @include size($width: 5, $height: 5);
+    background: var(--ink);
+    border-radius: 50%;
+  }
+}
+
+.disabled {
+  color: var(--ink-dim);
+  text-shadow: 1px 1px 0 var(--bevel-hi);
+}

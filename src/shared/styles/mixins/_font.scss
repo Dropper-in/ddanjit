@@ -1,0 +1,19 @@
+@use './utils' as *;
+
+@mixin font($size: null, $weight: null, $color: null, $line-height: null, $letter-spacing: null) {
+  @if $size != null {
+    font-size: to-unit($size);
+  }
+  @if $weight != null {
+    font-weight: $weight;
+  }
+  @if $color != null {
+    color: $color;
+  }
+  @if $line-height != null {
+    line-height: $line-height;
+  }
+  @if $letter-spacing != null {
+    letter-spacing: $letter-spacing;
+  }
+}

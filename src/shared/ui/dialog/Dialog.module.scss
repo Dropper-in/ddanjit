@@ -1,0 +1,101 @@
+@use 'mixins' as *;
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  @include flex($align: center, $justify: center);
+}
+
+.dialog {
+  background: var(--chrome);
+  box-shadow:
+    var(--bevel-out),
+    3px 3px 0 0 var(--bevel-xlo);
+  padding: 3px;
+  min-width: 320px;
+  max-width: 480px;
+
+  .body {
+    @include padding($y: 18, $x: 16);
+    @include flex($gap: 12, $align: flex-start);
+    font-family: 'Mona', monospace;
+    @include font($size: 12);
+
+    img {
+      flex: 0 0 32px;
+      image-rendering: pixelated;
+    }
+  }
+
+  .footer {
+    @include padding($bottom: 12, $x: 12);
+    @include flex($gap: 8, $justify: center);
+  }
+}
+
+// Window.module.scss와 동일 — 두 컴포넌트 모두 타이틀바를 가짐
+.titlebar {
+  background: linear-gradient(90deg, var(--titlebar) 0%, var(--titlebar-2) 100%);
+  color: var(--titlebar-fg);
+  font-family: 'Mona', monospace;
+  @include font($size: 14, $weight: 700);
+  height: 26px;
+  @include flex($align: center, $gap: 6);
+  @include padding($x: 5);
+  flex: 0 0 auto;
+
+  .title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ctrls {
+    @include flex($gap: 3);
+  }
+
+  .ctrl {
+    background: var(--chrome);
+    box-shadow: var(--bevel-out);
+    border: 0;
+    @include size($width: 24, $height: 20);
+    padding: 0;
+    flex: 0 0 24px;
+    @include flex($align: center, $justify: center);
+    cursor: default;
+
+    &:active {
+      box-shadow: var(--bevel-in);
+    }
+  }
+}
+
+:global([data-theme='crt']) .titlebar .ctrl {
+  color: var(--ink);
+}
+
+@include mobile {
+  .dialog {
+    min-width: 280px;
+    max-width: calc(100vw - 32px);
+
+    .body {
+      @include padding($y: 18, $x: 14);
+      @include font($size: 14);
+    }
+  }
+
+  .titlebar {
+    height: 32px;
+    @include font($size: 15);
+    @include padding($x: 8);
+    gap: 6px;
+
+    .ctrl {
+      @include size($width: 32, $height: 26);
+    }
+  }
+}

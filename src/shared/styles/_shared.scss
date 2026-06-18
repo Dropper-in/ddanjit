@@ -1,0 +1,59 @@
+@use 'mixins' as *;
+
+// ctrl-glyph 마스크 기반 아이콘 — Window, Dialog, TangentArchive 공통
+.ctrl-glyph {
+  display: block;
+  width: 12px;
+  height: 12px;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+.ctrl-glyph-min {
+  -webkit-mask-image: url(/icons/16/minimize.png);
+  mask-image: url(/icons/16/minimize.png);
+}
+
+.ctrl-glyph-max {
+  -webkit-mask-image: url(/icons/16/maximize.png);
+  mask-image: url(/icons/16/maximize.png);
+}
+
+.ctrl-glyph-close {
+  -webkit-mask-image: url(/icons/16/close.png);
+  mask-image: url(/icons/16/close.png);
+}
+
+// 인풋 필드 공통 — TangentArchive textarea, input 등
+.rpp-field {
+  font-family: 'Mona', monospace;
+  font-size: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--bevel-in);
+  border: 0;
+  padding: 4px 6px;
+  outline: none;
+  image-rendering: pixelated;
+}
+
+.rpp-field::placeholder,
+.dd-textarea::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-dim);
+  opacity: 1;
+}
+
+// 모바일에서 숨길 요소
+@include mobile {
+  .mobile-hide {
+    display: none !important;
+  }
+}

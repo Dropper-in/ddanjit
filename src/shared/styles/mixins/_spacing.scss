@@ -1,0 +1,69 @@
+@use './utils' as *;
+
+@mixin padding(
+  $all: null,
+  $x: null,
+  $y: null,
+  $top: null,
+  $right: null,
+  $bottom: null,
+  $left: null
+) {
+  @if $all != null {
+    padding: to-unit($all);
+  }
+  @if $y != null {
+    padding-top: to-unit($y);
+    padding-bottom: to-unit($y);
+  }
+  @if $x != null {
+    padding-right: to-unit($x);
+    padding-left: to-unit($x);
+  }
+  @if $top != null {
+    padding-top: to-unit($top);
+  }
+  @if $right != null {
+    padding-right: to-unit($right);
+  }
+  @if $bottom != null {
+    padding-bottom: to-unit($bottom);
+  }
+  @if $left != null {
+    padding-left: to-unit($left);
+  }
+}
+
+@mixin margin(
+  $all: null,
+  $x: null,
+  $y: null,
+  $top: null,
+  $right: null,
+  $bottom: null,
+  $left: null
+) {
+  @if $all != null {
+    margin: to-unit($all);
+  }
+  @if $y != null {
+    margin-top: to-unit($y);
+    margin-bottom: to-unit($y);
+  }
+  @if $x != null {
+    margin-right: to-unit($x);
+    margin-left: to-unit($x);
+  }
+  @if $top != null {
+    margin-top: to-unit($top);
+  }
+  @if $right != null {
+    margin-right: to-unit($right);
+  }
+  @if $bottom != null {
+    margin-bottom: to-unit($bottom);
+  }
+  @if $left != null {
+    margin-left: to-unit($left);
+  }
+}

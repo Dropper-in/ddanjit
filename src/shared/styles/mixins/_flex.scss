@@ -1,0 +1,17 @@
+@use './utils' as *;
+
+@mixin flex($direction: null, $align: null, $justify: null, $gap: null) {
+  display: flex;
+  @if $direction != null {
+    flex-direction: $direction;
+  }
+  @if $align != null {
+    align-items: $align;
+  }
+  @if $justify != null {
+    justify-content: $justify;
+  }
+  @if $gap != null {
+    gap: to-unit($gap);
+  }
+}

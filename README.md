@@ -1,7 +1,6 @@
 # 딴짓.os
 
-> 본업 안 하고 옆길로 새는 토이 프로젝트 모음 OS
-> _A retro pixel desktop for a collection of toy projects._
+> 할일 안 하고 옆길로 새는 토이 프로젝트 모음 OS
 
 ---
 

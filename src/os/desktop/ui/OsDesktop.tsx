@@ -101,7 +101,7 @@ export function OsDesktop({ apps, selectedId, onSelect, onOpen, futureSlots = 3 
           <b>읽어주세요 ⓘ</b>
           <div>
             여기는 <b>딴짓.os</b>.<br />
-            본업 안 하고
+            할일 안 하고
             <br />
             옆길로 새는
             <br />

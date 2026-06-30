@@ -35,7 +35,7 @@ export function DialogRouter({
           <span className={styles.dialogNote}>ddanjit.os · v1.0</span>
           <br />
           <br />
-          본업 안 하고 옆길로 새는 토이 프로젝트 모음.
+          할일 안 하고 옆길로 새는 토이 프로젝트 모음.
           <br />
           <span className={styles.dialogNote}>
             A collection of toy projects for procrastinators.

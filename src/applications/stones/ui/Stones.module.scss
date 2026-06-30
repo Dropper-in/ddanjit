@@ -1,0 +1,154 @@
+@use 'mixins' as *;
+
+$jelly-duration: 500ms;
+$wobble-duration: 650ms;
+
+:export {
+  jellyDuration: 500;
+  wobbleDuration: 650;
+  domTarget: 360;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.gifDialog {
+  min-width: 0;
+  max-width: 90vw;
+  width: fit-content;
+
+  // Dialog body(2번째 자식)는 flex row라 콘텐츠가 좌측 정렬 — 가운데로.
+  > div:nth-child(2) {
+    justify-content: center;
+  }
+
+  // 모바일: GIF 저장 창을 앱 영역 전체화면으로 (backdrop = 앱 body 영역을 가득 채움)
+  @include mobile {
+    // Dialog 기본 .dialog 규칙(max-width: calc(100vw-32px), max-height: calc(100%-32px))과
+    // 특이도가 같아 소스 순서로 밀림 → 클래스 2번 중첩으로 특이도 올려 이김
+    &#{&} {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: none; // 3px 오프셋 그림자 제거 — 가장자리 넘침 방지
+    }
+
+    // body가 남은 높이를 채우고 GIF를 상하·좌우 가운데로
+    > div:nth-child(2) {
+      flex: 1;
+      align-items: center;
+    }
+  }
+}
+
+// StoneThrower 인라인 상태바 — mobile-hide 적용 필요로 StatusBar 컴포넌트 미사용
+.statusbar {
+  display: flex;
+  height: 28px;
+  font-family: 'Mona Small', 'Mona', monospace;
+  font-size: 11px;
+  flex: 0 0 auto;
+}
+
+.statusCell {
+  flex: 1;
+  box-shadow: var(--bevel-in);
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--chrome);
+}
+
+.statusCellFixed {
+  flex: 0 0 auto;
+  min-width: 120px;
+  justify-content: center;
+}
+
+@keyframes jello-hit {
+  0% {
+    transform: scale(1, 1) skew(0deg);
+  }
+  8% {
+    transform: scale(1.07, 0.91) skew(-1.5deg);
+  }
+  20% {
+    transform: scale(0.95, 1.08) skew(1deg);
+  }
+  32% {
+    transform: scale(1.03, 0.97) skew(-0.5deg);
+  }
+  45% {
+    transform: scale(0.98, 1.03);
+  }
+  58% {
+    transform: scale(1.01, 0.99);
+  }
+  72% {
+    transform: scale(0.995, 1.005);
+  }
+  100% {
+    transform: scale(1, 1) skew(0deg);
+  }
+}
+
+.jellyChar {
+  transform-origin: center bottom;
+  animation: jello-hit $jelly-duration cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes wobble-hit {
+  0% {
+    transform: rotate(0deg);
+  }
+  12% {
+    transform: rotate(-5deg);
+  }
+  25% {
+    transform: rotate(4deg);
+  }
+  37% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+  65% {
+    transform: rotate(-1deg);
+  }
+  80% {
+    transform: rotate(0.5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.wobbleHit {
+  animation: wobble-hit $wobble-duration cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes reaction-fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reaction-fadeout {
+  to {
+    opacity: 0;
+  }
+}
+
+.reactionFade {
+  animation:
+    st-pop 150ms steps(2),
+    reaction-fadein 150ms steps(3),
+    reaction-fadeout 300ms steps(3) 700ms forwards !important;
+}

@@ -173,23 +173,6 @@
   margin: 2px 4px;
 }
 
-.attribution {
-  @include font($size: 10);
-  color: var(--ink-dim);
-  text-align: center;
-  @include padding($y: 6, $x: 8);
-
-  a {
-    color: inherit;
-    text-decoration: underline;
-    opacity: 0.8;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-}
-
 @include mobile {
   .taskbar {
     height: 48px;

@@ -80,12 +80,6 @@ export function StartMenu({ apps, onItem }: StartMenuProps) {
             <span className={styles.sub}>shut down...</span>
           </div>
         </div>
-        <div className={styles.attribution}>
-          Icons by{' '}
-          <a href="https://icons8.com" target="_blank" rel="noopener noreferrer">
-            Icons8
-          </a>
-        </div>
       </div>
     </div>
   );

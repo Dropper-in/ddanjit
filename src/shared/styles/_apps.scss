@@ -358,10 +358,6 @@
   }
 }
 
-.st-upload {
-  display: inline-block;
-}
-
 .st-stage {
   flex: 1;
   min-height: 240px;
@@ -373,6 +369,29 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  cursor: pointer; // 스테이지 클릭 = 제물(캐릭터) 이미지 교체
+}
+
+// 교체 가능 힌트 — 평소 흐릿, hover 시 또렷. DOM 전용이라 녹화 GIF엔 안 들어감
+.st-stage-hint {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  padding: 2px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--ink-dim);
+  background: var(--paper);
+  box-shadow: var(--bevel-out);
+  pointer-events: none;
+  opacity: 0.45;
+  transition: opacity 120ms;
+}
+
+.st-stage:hover .st-stage-hint {
+  opacity: 1;
 }
 
 .st-target {
@@ -404,6 +423,50 @@
   object-fit: contain;
 }
 
+// 제물 미업로드 시 드롭존 — 클릭해서 이미지 올리라고 명확히 안내
+.st-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 72%;
+  aspect-ratio: 1;
+  padding: 16px;
+  color: var(--ink-dim);
+  font-family: 'Mona', monospace;
+  text-align: center;
+  user-select: none;
+  transition: color 120ms;
+}
+
+.st-placeholder-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  border: 3px dashed var(--bevel-lo);
+  transition: border-color 120ms;
+}
+
+.st-placeholder-text {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+// 스테이지 hover 시 드롭존 또렷하게 — 클릭 가능 강조
+.st-stage:hover .st-placeholder {
+  color: var(--ink);
+}
+
+.st-stage:hover .st-placeholder-icon {
+  border-color: var(--ink);
+}
+
 .st-action-bar {
   display: flex;
   align-items: stretch;
@@ -424,7 +487,7 @@
   padding: 12px 24px;
   min-width: 0;
 
-  &:active {
+  &:not(:disabled):active {
     padding-top: 13px;
     padding-left: 25px;
     padding-bottom: 11px;

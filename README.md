@@ -6,14 +6,17 @@
 
 ## Apps
 
-| 아이콘 | ID        | 이름                                                      | 상태      | What it does                                                     |
-| :----: | --------- | --------------------------------------------------------- | --------- | ---------------------------------------------------------------- |
-|   🪨   | `stones`  | **사랑하는아이에게돌을던져보세요....exe**                 | ✅ 활성   | 사진 올려서 돌멩이/하트/별을 던지고 GIF로 저장                   |
-|   📝   | `tangent` | **딴생각아카이브.txt**                                    | 🔧 준비중 | 떠오른 딴생각을 적어두고, "무작위로 보여줘" 버튼으로 다시 만나기 |
-|   🎨   | `paint`   | **절대 바이러스 아닙니다. 믿어주세요... 전 그림판입니다** | 🔧 준비중 | 진짜 그림판. 진짜요.                                             |
-|   🔧   | —         | **준비중 × 1**                                            | 🔧 준비중 | 데스크톱 슬롯이 미래의 앱을 기다리는 중                          |
+| 아이콘 | ID        | 이름                                                      | 상태      | What it does                                                        |
+| :----: | --------- | --------------------------------------------------------- | --------- | ------------------------------------------------------------------- |
+|   🪨   | `stones`  | **사랑하는아이에게돌을던져보세요....exe**                 | ✅ 배포   | 제물(이미지) 올려 돌·하트·별 던지고 GIF로 저장. 투명 여백 자동 크롭 |
+|   📝   | `tangent` | **딴생각아카이브.txt**                                    | 🔧 개발중 | 떠오른 딴생각을 적어두고, "무작위로 보여줘"로 다시 만나기           |
+|   🎨   | `paint`   | **절대 바이러스 아닙니다. 믿어주세요... 전 그림판입니다** | 🔧 개발중 | 진짜 그림판. 진짜요.                                                |
+|   🛁   | `bath`    | **사랑하는아이를목욕시켜보세요....exe**                   | 🔧 개발중 | 제물을 목욕시키는 물 시뮬레이션 (전체화면)                          |
+|   🔧   | —         | **준비중 × 1**                                            | 🔧 준비중 | 데스크톱 슬롯이 미래의 앱을 기다리는 중                             |
 
 > 실제 아이콘은 pixel-art PNG. `src/shared/icons/` 참고.
+>
+> **현재 상태**: `stones`만 `develop`에 올라가 Vercel 배포됨. `tangent`·`paint`·`bath`는 개발 중(로컬 보존, 미배포). 활성 앱은 `src/app/config.ts`의 `APPS` 배열로 관리.
 
 ---
 
@@ -34,16 +37,19 @@ Start 메뉴 → 테마 변경에서 선택. `data-theme` 속성으로 전환.
 
 ## 실행
 
+패키지 매니저는 **Yarn 4** (`packageManager` 고정).
+
 ```bash
-npm install
+yarn install
 
-npm run dev           # 개발 서버 (localhost:3000)
-npm run build         # 프로덕션 빌드
-npm run storybook     # Storybook (localhost:6006)
-npm run typecheck     # 타입 체크
-
-npx eslint src        # 린트 검사
-npx prettier --write "src/**/*.{ts,tsx,scss}" # 포맷 적용
+yarn dev           # 개발 서버 (localhost:3000)
+yarn build         # 프로덕션 빌드
+yarn start         # 빌드 결과 실행
+yarn storybook     # Storybook (localhost:6006)
+yarn typecheck     # 타입 체크 (tsc --noEmit)
+yarn test          # 단위 테스트 (vitest)
+yarn test:e2e      # E2E (playwright)
+yarn lint          # ESLint 검사
 ```
 
 ---
@@ -63,33 +69,36 @@ src/
 │   ├── desktop/      # 바탕화면 (아이콘, sticky 메모)
 │   └── taskbar/      # 태스크바 & Start 메뉴
 │
-├── apps/             # 각 미니앱 (완전 독립)
-│   ├── stones/       # 돌 던지기 (StoneThrower, GIF 녹화)
-│   ├── paint/        # 그림판 (PaintApp, PaintCanvas)
-│   └── tangent/      # 딴생각아카이브 (TangentArchive)
-│       └── memo/     # 메모 카드 컴포넌트
+├── applications/     # 각 미니앱 (완전 독립)
+│   ├── stones/       # 돌 던지기 (StoneThrower, GIF 녹화) — model/ui 분리
+│   ├── paint/        # 그림판 (PaintApp, PaintCanvas)        — 개발중
+│   ├── tangent/      # 딴생각아카이브 (TangentArchive)        — 개발중
+│   │   └── memo/     # 메모 카드 컴포넌트
+│   └── bath/         # 목욕 (BathApp, 물 시뮬레이션)          — 개발중
 │
 └── shared/           # 진짜 공용 코드만
-    ├── ui/           # Button, Window, Dialog, Icon, Menubar, StatusBar
+    ├── ui/           # button, window, dialog, icon, menubar, status-bar, form-field
     ├── icons/        # pixel-art 아이콘 레지스트리
-    ├── lib/          # 유틸
+    ├── lib/          # 유틸 (cx, resolveIcon)
     ├── styles/       # 토큰, 폰트, 리셋, 믹스인
     └── types/        # AppDef, Memo 등 공용 타입
 ```
 
+> 폴더 import alias는 `@/` = `src/`. 예: `@/applications/stones`, `@/shared/ui/button`.
+
 ### 규칙
 
-- `apps/` 각 앱은 서로 import 금지 — 독립 실행 가능해야 함
+- `applications/` 각 앱은 서로 import 금지 — 독립 실행 가능해야 함
 - `os/`는 앱의 내용 모름 — `AppDef` 타입으로만 소통
 - `shared/`는 비즈니스 로직 없는 순수 UI·유틸만
-- 새 앱 추가 = `apps/` 에 폴더 하나, `app/config.ts`에 `AppDef` 등록
+- 새 앱 추가 = `applications/` 에 폴더 하나, `app/config.ts`에 `AppDef` 등록
 
 ```typescript
 // app/page.tsx — OS가 앱을 조합하는 방식
 import { OsDesktop } from '@/os/desktop';
 import { Taskbar } from '@/os/taskbar';
-import { StoneThrower } from '@/apps/stones';
-import { Window } from '@/shared/ui/Window';
+import { StoneThrower } from '@/applications/stones';
+import { Window } from '@/shared/ui/window';
 ```
 
 ### 배치 기준
@@ -97,7 +106,7 @@ import { Window } from '@/shared/ui/Window';
 | 상황                                | 위치                           |
 | ----------------------------------- | ------------------------------ |
 | OS UI (바탕화면, 태스크바, 창 크롬) | `os/`                          |
-| 미니앱 전체                         | `apps/{앱명}/`                 |
+| 미니앱 전체                         | `applications/{앱명}/`         |
 | 앱 전체에서 재사용하는 UI 원자      | `shared/ui/`                   |
 | 공용 타입·유틸                      | `shared/types/`, `shared/lib/` |
 
@@ -128,14 +137,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 // 2. 내부 절대 경로
-import { Button } from '@/shared/ui/Button';
-import { useUserStore } from '@/entities/user/store';
+import { Button } from '@/shared/ui/button';
+import { iconUrl } from '@/shared/icons';
 
 // 3. 상대 경로
-import { getReviews } from '../api/reviewApi';
+import { gameReducer } from '../model/reducer';
 
 // 4. 타입
-import type { User } from '@/entities/user/types/user.types';
+import type { AppDef } from '@/shared/types';
 
 // 5. 스타일
 import styles from './Component.module.scss';
@@ -185,6 +194,16 @@ function processData(data: unknown) {
   throw new Error('Invalid data');
 }
 ```
+
+---
+
+## 배포
+
+- **호스팅**: Vercel
+- **Production Branch**: `develop` — 푸시 시 자동 빌드·배포
+- **빌드**: `next build` (App Router · 정적 페이지 + `/api/memos` 동적 라우트)
+
+> Git Flow상 `main`이 프로덕션이지만, 현재 Vercel Production Branch는 `develop`으로 지정돼 있음 (Vercel → Settings → Git → Production Branch).
 
 ---
 

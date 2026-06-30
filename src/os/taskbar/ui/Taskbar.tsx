@@ -36,7 +36,9 @@ export function StartMenu({ apps, onItem }: StartMenuProps) {
             />
             <div className={styles.meta}>
               <b>{app.titleKo}</b>
-              {app.titleEn && <span className={styles.sub}>{app.titleEn}</span>}
+              {(app.description ?? app.titleEn) && (
+                <span className={styles.sub}>{app.description ?? app.titleEn}</span>
+              )}
             </div>
           </div>
         ))}

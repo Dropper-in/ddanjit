@@ -57,6 +57,7 @@ export const APPS: AppEntry[] = [
     id: 'stones',
     titleKo: '사랑하는아이에게돌을던져보세요....exe',
     titleEn: 'Throw Stones at Your Beloved',
+    description: '꼭 사랑하는 아이가 아니라도 괜찮습니다...',
     icon: iconUrl('stone'),
     component: StoneThrower,
   },

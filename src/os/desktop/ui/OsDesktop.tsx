@@ -69,7 +69,7 @@ export function OsDesktop({ apps, selectedId, onSelect, onOpen, futureSlots = 3 
                 onSelect(app.id);
               }
             }}
-            title={app.titleEn}
+            title={app.description ?? app.titleEn}
           >
             <div className={styles.iconInner}>
               <img src={app.icon} alt={app.titleKo} />

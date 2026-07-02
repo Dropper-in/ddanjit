@@ -397,7 +397,8 @@ export function useGifRecorder(refs: GifRecorderRefs) {
       drawFrame(canvas, refs, imgCache.current);
       enc.width = canvas.width;
       enc.height = canvas.height;
-      const encCtx = enc.getContext('2d');
+      // willReadFrequently: 매 프레임 getImageData 리드백 → GPU 우회로 인코딩 가속
+      const encCtx = enc.getContext('2d', { willReadFrequently: true });
       if (!encCtx) return;
       encCtx.imageSmoothingEnabled = false;
       encCtx.drawImage(canvas, 0, 0);

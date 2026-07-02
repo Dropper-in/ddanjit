@@ -20,7 +20,7 @@ export function DialogRouter({
   if (dialog.type === 'about') {
     return (
       <Dialog
-        icon="cat"
+        icon="logo-mark"
         title="딴짓.os 정보"
         onClose={onClose}
         buttons={

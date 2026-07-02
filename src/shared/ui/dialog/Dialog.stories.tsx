@@ -21,7 +21,7 @@ type Story = StoryObj<typeof Dialog>;
 export const Default: Story = {
   args: {
     title: '정말로 삭제하시겠습니까?',
-    icon: 'cat',
+    icon: 'logo-mark',
     children: '이런! 정말로 삭제하시겠습니까? 지금 되돌리실 기회입니다.',
     buttons: (
       <>

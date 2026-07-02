@@ -55,12 +55,22 @@ export function OsDesktop({ apps, selectedId, onSelect, onOpen, futureSlots = 3 
         return (
           <div
             key={app.id}
+            role="button"
+            tabIndex={0}
+            aria-label={app.titleKo}
             className={cx(styles.icon, isSelected ? styles.selected : undefined)}
             onMouseDown={(e) => {
               e.stopPropagation();
               onSelect(app.id);
             }}
             onDoubleClick={() => onOpen(app.id)}
+            onKeyDown={(e) => {
+              // 키보드 사용자는 Enter/Space 한 번으로 실행
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onOpen(app.id);
+              }
+            }}
             onTouchEnd={(e) => {
               e.stopPropagation();
               if (isSelected) {

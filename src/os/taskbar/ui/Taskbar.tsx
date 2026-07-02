@@ -1,3 +1,4 @@
+import type React from 'react';
 import { iconUrl } from '@/shared/icons';
 import { cx } from '@/shared/lib/ui';
 import styles from './Taskbar.module.scss';
@@ -7,6 +8,21 @@ export interface Task {
   id: string;
   icon: string;
   title: string;
+}
+
+// div 기반 클릭 항목을 키보드로도 실행 가능하게 — role/tabIndex + Enter/Space
+function activatable(run: () => void) {
+  return {
+    role: 'button' as const,
+    tabIndex: 0,
+    onClick: run,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        run();
+      }
+    },
+  };
 }
 
 export interface StartMenuProps {
@@ -26,7 +42,7 @@ export function StartMenu({ apps, onItem }: StartMenuProps) {
       <div className={styles.items}>
         <div className={styles.sectionLabel}>앱 / Apps</div>
         {apps.map((app) => (
-          <div key={app.id} className={styles.row} onClick={() => onItem(app.id)}>
+          <div key={app.id} className={styles.row} {...activatable(() => onItem(app.id))}>
             <img
               src={app.icon}
               width="24"
@@ -44,7 +60,7 @@ export function StartMenu({ apps, onItem }: StartMenuProps) {
         ))}
         <div className={styles.sep} />
         <div className={styles.sectionLabel}>설정 / Settings</div>
-        <div className={styles.row} onClick={() => onItem('spectrum')}>
+        <div className={styles.row} {...activatable(() => onItem('spectrum'))}>
           <span style={{ fontSize: 24, lineHeight: '24px', width: 24, textAlign: 'center' }}>
             🎨
           </span>
@@ -53,7 +69,7 @@ export function StartMenu({ apps, onItem }: StartMenuProps) {
             <span className={styles.sub}>spectrum...</span>
           </div>
         </div>
-        <div className={styles.row} onClick={() => onItem('about')}>
+        <div className={styles.row} {...activatable(() => onItem('about'))}>
           <img
             src={iconUrl('help')}
             width="24"
@@ -67,7 +83,7 @@ export function StartMenu({ apps, onItem }: StartMenuProps) {
           </div>
         </div>
         <div className={styles.sep} />
-        <div className={styles.row} onClick={() => onItem('shutdown')}>
+        <div className={styles.row} {...activatable(() => onItem('shutdown'))}>
           <img
             src={iconUrl('close')}
             width="24"
@@ -111,10 +127,20 @@ export function Taskbar({
       {/* data-start — OsShell closest() 감지용 */}
       <div
         data-start=""
+        role="button"
+        tabIndex={0}
+        aria-label="시작"
+        aria-expanded={startOpen}
         className={cx(styles.start, startOpen ? styles.open : undefined)}
         onMouseDown={(e) => {
           e.preventDefault();
           onStart();
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onStart();
+          }
         }}
       >
         <img
@@ -130,9 +156,10 @@ export function Taskbar({
       {tasks.map((task) => (
         <div
           key={task.id}
+          aria-label={task.title}
           className={cx(styles.task, activeId === task.id ? styles.active : undefined)}
-          onClick={() => onTask(task.id)}
           title={task.title}
+          {...activatable(() => onTask(task.id))}
         >
           <img
             src={task.icon}

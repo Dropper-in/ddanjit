@@ -3,6 +3,7 @@ import { useState, useEffect, useReducer, useRef } from 'react';
 import { cx } from '@/shared/lib/ui';
 import { iconUrl } from '@/shared/icons';
 import { Button } from '@/shared/ui/button';
+import { Dialog } from '@/shared/ui/dialog';
 import styles from './Stones.module.scss';
 import { AMMO_TYPES, getReactions } from '../model/constants';
 import { gameReducer } from '../model/reducer';
@@ -23,6 +24,7 @@ export function StoneThrower() {
   const [reactionFrame, setReactionFrame] = useState(0);
   // 빈 문자열 = 아직 제물 없음 → StageArea가 드롭존 placeholder 표시
   const [characterUrl, setCharacterUrl] = useState('');
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [imgDims, setImgDims] = useState({ width: 1, height: 1 });
 
   const [game, dispatch] = useReducer(gameReducer, { projectiles: [], stuck: [], impactSeq: 0 });
@@ -191,7 +193,8 @@ export function StoneThrower() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      alert('이미지 파일이 너무 큽니다 (최대 10MB)');
+      setUploadError('이미지 파일이 너무 큽니다 (최대 10MB)');
+      e.target.value = '';
       return;
     }
     const raw = URL.createObjectURL(file);
@@ -274,6 +277,19 @@ export function StoneThrower() {
     <div className="st-app">
       <canvas ref={hiddenCanvasRef} style={{ display: 'none' }} />
       {gifUrl && <GifPreviewDialog gifUrl={gifUrl} onClose={closeGif} />}
+      {uploadError && (
+        <Dialog
+          title="업로드 실패"
+          onClose={() => setUploadError(null)}
+          buttons={
+            <Button isDefault onClick={() => setUploadError(null)}>
+              확인
+            </Button>
+          }
+        >
+          {uploadError}
+        </Dialog>
+      )}
 
       <Toolbar
         ammoId={ammoId}

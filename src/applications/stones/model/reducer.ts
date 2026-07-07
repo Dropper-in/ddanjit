@@ -76,5 +76,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { projectiles: [], stuck: [], impactSeq: 0 };
     case 'clear_stuck':
       return { ...state, stuck: [] };
+    default: {
+      // 새 액션 누락 시 컴파일 에러 + 런타임엔 상태 유지
+      const _exhaustive: never = action;
+      return state;
+    }
   }
 }

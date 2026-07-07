@@ -18,9 +18,9 @@ body,
   background: var(--desktop);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  -webkit-font-smoothing: none;
-  -moz-osx-font-smoothing: none;
-  font-smooth: never;
+  // macOS에서 smoothing:none은 12px 배수가 아닌 크기(16/20/32px)에서 획이 소실됨 — grayscale AA 사용
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: geometricPrecision;
   overflow: hidden;
 }

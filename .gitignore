@@ -42,6 +42,10 @@ Thumbs.db
 
 # Claude
 .claude/
+goals/
+CLAUDE.md
+docs/goal-workflow.md
+docs/harness-engineering.md
 
 # Storybook build output
 public/storybook/

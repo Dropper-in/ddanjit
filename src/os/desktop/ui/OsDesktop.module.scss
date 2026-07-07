@@ -94,69 +94,6 @@
   clip-path: inset(0);
 }
 
-@keyframes stickyFadeOut {
-  from {
-    opacity: 1;
-    transform: rotate(-1.5deg) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: rotate(-1.5deg) scale(0.92);
-  }
-}
-
-.sticky {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 260px;
-  background: #fff6a8;
-  color: #3a2a14;
-  @include padding($top: 20, $bottom: 22, $x: 18);
-  box-shadow: 4px 4px 0 0 var(--bevel-xlo);
-  font-family: 'Mona', monospace;
-  @include font($size: 14);
-  line-height: 1.55;
-  z-index: 1;
-  transform: rotate(-1.5deg);
-
-  &.closing {
-    animation: stickyFadeOut 200ms ease-in forwards;
-    pointer-events: none;
-  }
-
-  b {
-    display: block;
-    margin-bottom: 8px;
-    @include font($size: 17);
-  }
-
-  .dim {
-    color: #6a4a14;
-    @include font($size: 12);
-  }
-}
-
-.stickyClose {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  @include size($width: 22, $height: 22);
-  background: transparent;
-  border: 0;
-  padding: 0;
-  font-family: 'Mona', monospace;
-  @include font($size: 16, $weight: 700);
-  line-height: 1;
-  color: #6a4a14;
-  cursor: pointer;
-
-  &:hover {
-    color: #3a2a14;
-    background: rgba(0, 0, 0, 0.06);
-  }
-}
-
 @include mobile {
   .desktop {
     inset: 0 0 48px 0;
@@ -175,25 +112,9 @@
       @include size($width: 56, $height: 56);
     }
   }
-
-  .sticky {
-    width: 200px;
-    top: 14px;
-    right: 14px;
-    @include padding($top: 16, $bottom: 18, $x: 14);
-    @include font($size: 13);
-
-    b {
-      @include font($size: 15);
-    }
-  }
 }
 
 @include mobile-xs {
-  .sticky {
-    display: none;
-  }
-
   .desktop {
     @include padding($all: 10);
   }

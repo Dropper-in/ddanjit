@@ -254,7 +254,7 @@ function drawFrame(
   // reaction bubble
   if (shake.current > 0 && refs.showReaction.current) {
     const curAmmo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId.current);
-    const reactions = getReactions(curAmmo?.sticks ?? false);
+    const reactions = getReactions(curAmmo ? (curAmmo.happy ?? curAmmo.sticks) : false);
     const expression = reactions[reactionFrame.current % reactions.length];
     ctx.font = 'bold 18px Mona, monospace';
     const textWidth = ctx.measureText(expression).width;
@@ -405,8 +405,7 @@ export function useGifRecorder(refs: GifRecorderRefs) {
       framesRef.current.push(encCtx.getImageData(0, 0, enc.width, enc.height));
     }, 33);
     autoStopRef.current = setTimeout(() => stopRecordingRef.current(), MAX_RECORDING_MS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refs.ammoId]);
+  }, [refs]);
 
   const stopRecording = useCallback(() => {
     setRecording(false);

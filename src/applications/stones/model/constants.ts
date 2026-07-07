@@ -26,6 +26,7 @@ export const AMMO_TYPES: AmmoType[] = [
     label: '돈다발',
     color: '#3a8a3a',
     sticks: false,
+    happy: true,
     size: 56,
   },
   { id: 'heart', icon: '', emoji: '❤️', label: '하트', color: '#cc1a1a', sticks: true, size: 56 },
@@ -38,6 +39,7 @@ export const AMMO_TYPES: AmmoType[] = [
     label: '빠직마크',
     color: '#a01acc',
     sticks: true,
+    happy: false,
     size: 56,
   },
 ];
@@ -46,6 +48,6 @@ export const AMMO_TYPES: AmmoType[] = [
 export const FLIGHT_FRAMES = 12;
 export const BOUNCE_FRAMES = 44;
 
-export function getReactions(sticks: boolean): string[] {
-  return sticks ? ['♥', '><', '꺅', 'ㅋ', '헤헤'] : ['ㅠㅠ', '><', 'ㅜㅜ', '헉', '악'];
+export function getReactions(happy: boolean): string[] {
+  return happy ? ['♥', '><', '꺅', 'ㅋ', '헤헤'] : ['ㅠㅠ', '><', 'ㅜㅜ', '헉', '악'];
 }

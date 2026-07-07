@@ -267,7 +267,7 @@ export function StoneThrower() {
   }
 
   const ammo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId)!;
-  const reactions = getReactions(ammo.sticks);
+  const reactions = getReactions(ammo.happy ?? ammo.sticks);
   const reactionExpr = reactions[reactionFrame % reactions.length];
 
   return (

@@ -6,6 +6,7 @@ export interface AmmoType {
   label: string;
   color: string;
   sticks: boolean; // true = 맞으면 박힘, false = 튕겨나감
+  happy?: boolean; // 반응 말풍선 무드 — 생략 시 sticks 따름
   size: number; // 렌더링 크기 (px)
 }
 

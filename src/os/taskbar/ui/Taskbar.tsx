@@ -1,6 +1,5 @@
-import type React from 'react';
 import { iconUrl } from '@/shared/icons';
-import { cx } from '@/shared/lib/ui';
+import { activatable, cx } from '@/shared/lib/ui';
 import styles from './Taskbar.module.scss';
 import type { AppDef } from '@/shared/types';
 
@@ -8,21 +7,6 @@ export interface Task {
   id: string;
   icon: string;
   title: string;
-}
-
-// div 기반 클릭 항목을 키보드로도 실행 가능하게 — role/tabIndex + Enter/Space
-function activatable(run: () => void) {
-  return {
-    role: 'button' as const,
-    tabIndex: 0,
-    onClick: run,
-    onKeyDown: (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        run();
-      }
-    },
-  };
 }
 
 export interface StartMenuProps {

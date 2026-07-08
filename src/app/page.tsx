@@ -19,15 +19,20 @@ export default function Home() {
   const [desktopSel, setDesktopSel] = useState<AppId | null>(null);
 
   useEffect(() => {
-    setClock(formatClock());
-    const id = setInterval(() => setClock(formatClock()), 15000);
-    return () => clearInterval(id);
+    let id: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      setClock(formatClock());
+      id = setTimeout(tick, 60_000 - (Date.now() % 60_000) + 50);
+    };
+    tick();
+    return () => clearTimeout(id);
   }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', spectrum === 'win98' ? '' : spectrum);
   }, [spectrum]);
 
+  // 시작버튼+메뉴 두 서브트리를 봐야 해서 useOutsideClick 미적용
   useEffect(() => {
     if (!startOpen) return;
     function onClick(e: MouseEvent) {

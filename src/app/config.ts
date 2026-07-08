@@ -74,11 +74,7 @@ export const APPS: AppEntry[] = [
 
 export type DialogState = { type: 'about' | 'shutdown' | 'spectrum' } | null;
 
+const clockFmt = new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: '2-digit' });
 export function formatClock(date = new Date()): string {
-  let hours = date.getHours();
-  const minutes = date.getMinutes();
-  const am = hours < 12 ? '오전' : '오후';
-  hours = hours % 12;
-  if (hours === 0) hours = 12;
-  return `${am} ${hours}:${minutes.toString().padStart(2, '0')}`;
+  return clockFmt.format(date);
 }

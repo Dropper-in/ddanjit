@@ -1,5 +1,7 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
+import { activatable } from '@/shared/lib/ui';
+import { useOutsideClick } from '@/shared/lib/useOutsideClick';
 import type { AmmoType } from '../model/types';
 
 export function AmmoDropdown({
@@ -14,14 +16,7 @@ export function AmmoDropdown({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    function onClick(e: MouseEvent) {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
-  }, [open]);
+  useOutsideClick(ref, () => setOpen(false), open);
 
   const current = options.find((option) => option.id === value) ?? options[0];
 
@@ -51,10 +46,10 @@ export function AmmoDropdown({
             <div
               key={option.id}
               className={'row' + (option.id === value ? ' selected' : '')}
-              onClick={() => {
+              {...activatable(() => {
                 onChange(option.id);
                 setOpen(false);
-              }}
+              })}
             >
               {option.emoji ? (
                 <span style={{ fontSize: 16, lineHeight: 1 }}>{option.emoji}</span>

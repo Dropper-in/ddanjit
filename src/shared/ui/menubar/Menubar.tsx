@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from 'react';
-import { cx } from '@/shared/lib/ui';
+import { useRef, useState, type ReactNode, type CSSProperties } from 'react';
+import { activatable, cx } from '@/shared/lib/ui';
+import { useOutsideClick } from '@/shared/lib/useOutsideClick';
 import styles from './Menubar.module.scss';
 
 export interface MenuItem {
@@ -29,13 +30,7 @@ export function Menubar({ menus, onAction }: MenubarProps) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   // 메뉴바 외부 클릭 시 열린 메뉴 닫기
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (!ref.current?.contains(e.target as Node)) setOpenIdx(null);
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+  useOutsideClick(ref, () => setOpenIdx(null), openIdx !== null);
 
   return (
     <div className={styles.menubar} ref={ref}>
@@ -70,12 +65,13 @@ export function Menubar({ menus, onAction }: MenubarProps) {
                       it.checked ? styles.checked : undefined,
                       it.disabled ? styles.disabled : undefined,
                     )}
-                    onClick={() => {
+                    {...activatable(() => {
                       if (it.disabled) return;
                       setOpenIdx(null);
                       if (it.onClick) it.onClick();
                       else onAction(it.id);
-                    }}
+                    })}
+                    tabIndex={it.disabled ? -1 : 0}
                   >
                     <span>{it.label}</span>
                     {it.shortcut && <span className={styles.right}>{it.shortcut}</span>}
@@ -114,13 +110,7 @@ export function MenuButton({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+  useOutsideClick(ref, () => setOpen(false), open);
 
   const current = items.find((it): it is MenuItem => it !== '---' && it.id === value);
   const label = current ? current.label : placeholder;
@@ -156,12 +146,13 @@ export function MenuButton({
                   it.id === value ? styles.checked : undefined,
                   it.disabled ? styles.disabled : undefined,
                 )}
-                onClick={() => {
+                {...activatable(() => {
                   if (it.disabled) return;
                   setOpen(false);
                   if (it.onClick) it.onClick();
                   else onChange?.(it.id);
-                }}
+                })}
+                tabIndex={it.disabled ? -1 : 0}
               >
                 <span>{it.label}</span>
                 {it.shortcut && <span className={styles.right}>{it.shortcut}</span>}

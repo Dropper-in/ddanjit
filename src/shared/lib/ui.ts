@@ -1,4 +1,20 @@
+import type React from 'react';
 import { iconUrl, type IconName } from '@/shared/icons';
+
+// div 기반 클릭 항목을 키보드로도 실행 가능하게 — role/tabIndex + Enter/Space
+export function activatable(run: () => void) {
+  return {
+    role: 'button' as const,
+    tabIndex: 0,
+    onClick: run,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        run();
+      }
+    },
+  };
+}
 
 /** 클래스명 조합 — falsy 값 자동 제거 */
 export function cx(...classes: (string | undefined | null | false)[]): string {

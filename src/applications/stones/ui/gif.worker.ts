@@ -1,12 +1,21 @@
 import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 
-interface WorkerInput {
-  frames: { data: Uint8ClampedArray; width: number; height: number }[];
-  delay: number;
-}
+type WorkerIn =
+  | { type: 'frame'; data: Uint8ClampedArray; width: number; height: number }
+  | { type: 'finish'; delay: number };
 
-self.onmessage = (e: MessageEvent<WorkerInput>) => {
-  const { frames, delay } = e.data;
+// ponytail: 프레임 원본을 워커 힙에 그대로 누적(30fps·10s ≈ 340MB). 부족하면 수신 즉시 applyPalette로 인덱스화(4→1바이트)
+const frames: { data: Uint8ClampedArray; width: number; height: number }[] = [];
+
+self.onmessage = (e: MessageEvent<WorkerIn>) => {
+  const msg = e.data;
+  if (msg.type === 'frame') {
+    frames.push({ data: msg.data, width: msg.width, height: msg.height });
+    return;
+  }
+
+  // msg.type === 'finish'
+  const { delay } = msg;
   const gif = GIFEncoder();
 
   // Sample evenly across all frames for a representative palette

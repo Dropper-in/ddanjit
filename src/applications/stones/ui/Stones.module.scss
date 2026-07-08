@@ -1,11 +1,12 @@
 @use 'mixins' as *;
+@use 'sass:math';
 
 $jelly-duration: 500ms;
 $wobble-duration: 650ms;
 
 :export {
-  jellyDuration: 500;
-  wobbleDuration: 650;
+  jellyDuration: math.div($jelly-duration, 1ms);
+  wobbleDuration: math.div($wobble-duration, 1ms);
   domTarget: 360;
 }
 

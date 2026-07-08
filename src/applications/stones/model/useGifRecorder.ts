@@ -9,12 +9,13 @@ import {
   GIF_MIN_W,
   GIF_MIN_H,
   GIF_MAX_W,
+  STAGE_REF,
   wobbleRotation,
   jellyTransform,
 } from '../ui/canvasConfig';
 import type { GameState } from './types';
 
-async function prerenderEmoji(emoji: string, size: number): Promise<HTMLImageElement> {
+async function prerenderEmoji(emoji: string, size: number): Promise<HTMLCanvasElement> {
   // Mona Emoji는 12px 픽셀 폰트 → 1:1 prerender 후 nearest neighbor 스케일
   const dim = size;
   const fontPx = Math.round(dim * 0.85);
@@ -24,6 +25,7 @@ async function prerenderEmoji(emoji: string, size: number): Promise<HTMLImageEle
       await document.fonts.load(`${fontPx}px "Mona Emoji"`, emoji);
     } catch {}
   }
+  // blob 왕복(toBlob → objectURL → Image) 제거 — canvas를 drawImage 소스로 직접 반환
   const canvas = document.createElement('canvas');
   canvas.width = dim;
   canvas.height = dim;
@@ -33,21 +35,49 @@ async function prerenderEmoji(emoji: string, size: number): Promise<HTMLImageEle
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(emoji, dim / 2, dim / 2);
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    canvas.toBlob((b) => {
-      if (!b) {
-        reject(new Error('toBlob failed'));
-        return;
-      }
-      const u = URL.createObjectURL(b);
-      loadImg(u)
-        .then((finalImg) => {
-          URL.revokeObjectURL(u);
-          resolve(finalImg);
-        })
-        .catch(reject);
-    });
-  });
+  return canvas;
+}
+
+// startRecording 시 1회 스냅샷하는 테마 색상(녹화 중 불변 가정)
+type ThemeSnapshot = {
+  paper: string;
+  ink: string;
+  chrome: string;
+  bevelHi: string;
+  bevelLo: string;
+  bevelXlo: string;
+  titlebar: string;
+  titlebar2: string;
+  titlebarFg: string;
+};
+
+function snapshotTheme(): ThemeSnapshot {
+  const cs = getComputedStyle(document.documentElement);
+  const getCssVar = (name: string) => cs.getPropertyValue(name).trim();
+  return {
+    paper: getCssVar('--paper'),
+    ink: getCssVar('--ink'),
+    chrome: getCssVar('--chrome'),
+    bevelHi: getCssVar('--bevel-hi'),
+    bevelLo: getCssVar('--bevel-lo'),
+    bevelXlo: getCssVar('--bevel-xlo'),
+    titlebar: getCssVar('--titlebar'),
+    titlebar2: getCssVar('--titlebar-2'),
+    titlebarFg: getCssVar('--titlebar-fg'),
+  };
+}
+
+// CanvasImageSource의 고유 크기 — HTMLImageElement는 naturalWidth, canvas 등은 width 사용
+function imgSourceWidth(src: CanvasImageSource): number {
+  if (src instanceof HTMLImageElement) return src.naturalWidth;
+  if (src instanceof HTMLCanvasElement || src instanceof ImageBitmap) return src.width;
+  return (src as HTMLVideoElement).videoWidth ?? 0;
+}
+
+function imgSourceHeight(src: CanvasImageSource): number {
+  if (src instanceof HTMLImageElement) return src.naturalHeight;
+  if (src instanceof HTMLCanvasElement || src instanceof ImageBitmap) return src.height;
+  return (src as HTMLVideoElement).videoHeight ?? 0;
 }
 
 export type GifRecorderRefs = {
@@ -73,7 +103,8 @@ export type GifRecorderRefs = {
 function drawFrame(
   canvas: HTMLCanvasElement,
   refs: GifRecorderRefs,
-  imgCache: Map<string, HTMLImageElement>,
+  imgCache: Map<string, CanvasImageSource>,
+  theme: ThemeSnapshot,
 ) {
   const {
     imgDims,
@@ -99,32 +130,23 @@ function drawFrame(
     imgWidth = Math.round((imgWidth * GIF_MIN_H) / imgHeight);
     imgHeight = GIF_MIN_H;
   }
-  // ponytail: 임시 폭 상한 — 큰 업로드 이미지를 480으로 다운스케일해 인코딩 가속. min 보정 뒤 마지막에 캡.
+  // 폭 상한 — 큰 업로드 이미지를 다운스케일해 인코딩 가속. min 보정 뒤 마지막에 캡.
   if (imgWidth > GIF_MAX_W) {
     imgHeight = Math.round((imgHeight * GIF_MAX_W) / imgWidth);
     imgWidth = GIF_MAX_W;
   }
 
-  canvas.width = imgWidth + GIF_BORDER * 2;
-  canvas.height = imgHeight + GIF_TITLEBAR_H + GIF_FOOTER_H + GIF_BORDER * 2;
+  const canvasWidth = imgWidth + GIF_BORDER * 2;
+  const canvasHeight = imgHeight + GIF_TITLEBAR_H + GIF_FOOTER_H + GIF_BORDER * 2;
+  // 캔버스 크기는 imgDims에서 파생되고 녹화 중 불변 — 크기가 바뀔 때만 재대입(재대입은 컨텍스트 초기화 유발).
+  if (canvas.width !== canvasWidth) canvas.width = canvasWidth;
+  if (canvas.height !== canvasHeight) canvas.height = canvasHeight;
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  const cs = getComputedStyle(document.documentElement);
-  const getCssVar = (name: string) => cs.getPropertyValue(name).trim();
-  const paper = getCssVar('--paper');
-  const ink = getCssVar('--ink');
-  const chrome = getCssVar('--chrome');
-  const bevelHi = getCssVar('--bevel-hi');
-  const bevelLo = getCssVar('--bevel-lo');
-  const bevelXlo = getCssVar('--bevel-xlo');
-  const titlebar = getCssVar('--titlebar');
-  const titlebar2 = getCssVar('--titlebar-2');
-  const titlebarFg = getCssVar('--titlebar-fg');
-
-  const canvasWidth = canvas.width;
-  const canvasHeight = canvas.height;
+  const { paper, ink, chrome, bevelHi, bevelLo, bevelXlo, titlebar, titlebar2, titlebarFg } = theme;
 
   // bevel border
   ctx.fillStyle = bevelHi;
@@ -166,7 +188,7 @@ function drawFrame(
   ctx.rect(contentX, contentY, imgWidth, imgHeight);
   ctx.clip();
 
-  const canvasTarget = Math.round(Math.min(imgWidth, imgHeight) * (480 / 512));
+  const canvasTarget = Math.round(Math.min(imgWidth, imgHeight) * (GIF_MAX_W / STAGE_REF));
   const domTarget = target.current?.getBoundingClientRect().width ?? refs.domTargetSize;
   const coordScale = canvasTarget / domTarget;
   const offsetX = contentX + (imgWidth - canvasTarget) / 2;
@@ -186,7 +208,10 @@ function drawFrame(
     ctx.rotate((wobbleDeg * Math.PI) / 180);
     ctx.translate(0, charDrawSize / 2);
     ctx.transform(sx, 0, Math.tan((skx * Math.PI) / 180) * sy, sy, 0, 0);
-    const naturalAspect = charImg.naturalWidth / charImg.naturalHeight;
+    // charImg는 loadImg 경유 HTMLImageElement(naturalWidth 보유)지만, cache 타입은 CanvasImageSource라 소스별로 크기 접근을 분기
+    const charW = imgSourceWidth(charImg);
+    const charH = imgSourceHeight(charImg);
+    const naturalAspect = charW / charH;
     const drawWidth = naturalAspect >= 1 ? charDrawSize : Math.round(charDrawSize * naturalAspect);
     const drawHeight = naturalAspect >= 1 ? Math.round(charDrawSize / naturalAspect) : charDrawSize;
     ctx.drawImage(charImg, -drawWidth / 2, -drawHeight, drawWidth, drawHeight);
@@ -353,15 +378,18 @@ export function useGifRecorder(refs: GifRecorderRefs) {
   const [gifUrl, setGifUrl] = useState<string | null>(null);
 
   const MAX_RECORDING_MS = 10000;
+  // 캡처 간격 = GIF 프레임 delay — 반드시 동일 값 (30fps)
+  const FRAME_DELAY_MS = 33;
 
-  const imgCache = useRef<Map<string, HTMLImageElement>>(new Map());
-  const framesRef = useRef<ImageData[]>([]);
+  const imgCache = useRef<Map<string, CanvasImageSource>>(new Map());
   const encCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const frameIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const autoStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stopRecordingRef = useRef<() => void>(() => {});
-  // 활성 인코딩 워커 — 언마운트/done/onerror 시 정리용
+  // 활성 인코딩/녹화 워커 — startRecording에서 생성, 언마운트/done/onerror 시 정리용
   const workerRef = useRef<Worker | null>(null);
+  // 이번 녹화에서 워커로 전송한 프레임 수 — finish 전송 여부 판단(0이면 워커 스킵)
+  const frameCountRef = useRef(0);
   // gifUrl 스냅샷 ref — 언마운트 cleanup에서 revoke (stale 클로저 방지)
   const gifUrlRef = useRef<string | null>(null);
   gifUrlRef.current = gifUrl;
@@ -387,40 +415,11 @@ export function useGifRecorder(refs: GifRecorderRefs) {
   }, [preload]);
 
   const startRecording = useCallback(() => {
-    framesRef.current = [];
     setRecording(true);
+    frameCountRef.current = 0;
     if (!encCanvasRef.current) encCanvasRef.current = document.createElement('canvas');
-    frameIntervalRef.current = setInterval(() => {
-      const canvas = refs.hiddenCanvas.current;
-      const enc = encCanvasRef.current;
-      if (!canvas || !enc) return;
-      drawFrame(canvas, refs, imgCache.current);
-      enc.width = canvas.width;
-      enc.height = canvas.height;
-      // willReadFrequently: 매 프레임 getImageData 리드백 → GPU 우회로 인코딩 가속
-      const encCtx = enc.getContext('2d', { willReadFrequently: true });
-      if (!encCtx) return;
-      encCtx.imageSmoothingEnabled = false;
-      encCtx.drawImage(canvas, 0, 0);
-      framesRef.current.push(encCtx.getImageData(0, 0, enc.width, enc.height));
-    }, 33);
-    autoStopRef.current = setTimeout(() => stopRecordingRef.current(), MAX_RECORDING_MS);
-  }, [refs]);
 
-  const stopRecording = useCallback(() => {
-    setRecording(false);
-    if (frameIntervalRef.current) {
-      clearInterval(frameIntervalRef.current);
-      frameIntervalRef.current = null;
-    }
-    if (autoStopRef.current) {
-      clearTimeout(autoStopRef.current);
-      autoStopRef.current = null;
-    }
-    const frames = framesRef.current;
-    if (!frames.length) return;
-    setEncoding(true);
-    setEncodingPct(0);
+    // 녹화 시작 시 워커 생성 — 프레임은 캡처 즉시 transfer(메인 스레드 상주 제거)
     const worker = new Worker(new URL('../ui/gif.worker.ts', import.meta.url));
     workerRef.current = worker;
     const clearWorker = () => {
@@ -450,10 +449,55 @@ export function useGifRecorder(refs: GifRecorderRefs) {
       setEncoding(false);
       clearWorker();
     };
-    worker.postMessage(
-      { frames, delay: 33 },
-      frames.map((frame) => frame.data.buffer as ArrayBuffer),
-    );
+
+    // 테마 색상은 녹화 중 불변 가정 — 시작 시 1회 스냅샷
+    const theme = snapshotTheme();
+    frameIntervalRef.current = setInterval(() => {
+      const canvas = refs.hiddenCanvas.current;
+      const enc = encCanvasRef.current;
+      if (!canvas || !enc) return;
+      drawFrame(canvas, refs, imgCache.current, theme);
+      if (enc.width !== canvas.width) enc.width = canvas.width;
+      if (enc.height !== canvas.height) enc.height = canvas.height;
+      // willReadFrequently: 매 프레임 getImageData 리드백 → GPU 우회로 인코딩 가속
+      const encCtx = enc.getContext('2d', { willReadFrequently: true });
+      if (!encCtx) return;
+      encCtx.imageSmoothingEnabled = false;
+      encCtx.drawImage(canvas, 0, 0);
+      const imageData = encCtx.getImageData(0, 0, enc.width, enc.height);
+      // 캡처 즉시 워커로 transfer — framesRef 누적 제거
+      workerRef.current?.postMessage(
+        { type: 'frame', data: imageData.data, width: enc.width, height: enc.height },
+        [imageData.data.buffer as ArrayBuffer],
+      );
+      frameCountRef.current += 1;
+    }, FRAME_DELAY_MS);
+    autoStopRef.current = setTimeout(() => stopRecordingRef.current(), MAX_RECORDING_MS);
+  }, [refs]);
+
+  const stopRecording = useCallback(() => {
+    setRecording(false);
+    if (frameIntervalRef.current) {
+      clearInterval(frameIntervalRef.current);
+      frameIntervalRef.current = null;
+    }
+    if (autoStopRef.current) {
+      clearTimeout(autoStopRef.current);
+      autoStopRef.current = null;
+    }
+    const worker = workerRef.current;
+    if (!worker) return;
+    // 즉시 stop 등으로 프레임이 0개면 인코딩 스킵 — 워커 terminate + 상태 해제
+    if (frameCountRef.current === 0) {
+      worker.terminate();
+      workerRef.current = null;
+      setEncoding(false);
+      return;
+    }
+    setEncoding(true);
+    setEncodingPct(0);
+    // 프레임은 이미 스트리밍 transfer됨 — finish만 보내면 워커가 인코딩 실행
+    worker.postMessage({ type: 'finish', delay: FRAME_DELAY_MS });
   }, []);
 
   stopRecordingRef.current = stopRecording;

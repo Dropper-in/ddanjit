@@ -6,8 +6,10 @@ export const GIF_FOOTER_H = 56;
 export const GIF_BORDER = 3;
 export const GIF_MIN_W = 420;
 export const GIF_MIN_H = 300;
-// ponytail: 임시 인코딩 폭 상한 — GIF 인코딩 속도 개선용(폭²로 픽셀 감소). 영구화/값 조정은 추후.
+// 인코딩 폭 상한 — 큰 업로드 이미지를 다운스케일해 GIF 인코딩 가속(픽셀 수가 폭²로 감소).
 export const GIF_MAX_W = 480;
+// DOM 스테이지(딴짓 창 콘텐츠) 기준 크기 — 캔버스 좌표 스케일 산출 기준.
+export const STAGE_REF = 512;
 
 // --- Animation keyframes ---
 export const WOBBLE_KF = [

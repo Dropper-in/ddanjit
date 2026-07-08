@@ -57,16 +57,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
       });
 
-      const existingIds = newStuck.length
-        ? new Set(state.stuck.map((stuckItem) => stuckItem.id))
-        : null;
-      const freshStuck = existingIds
-        ? newStuck.filter((stuckItem) => !existingIds.has(stuckItem.id))
-        : [];
-
       return {
         projectiles: next,
-        stuck: freshStuck.length ? [...state.stuck.slice(-40), ...freshStuck] : state.stuck,
+        stuck: newStuck.length ? [...state.stuck.slice(-40), ...newStuck] : state.stuck,
         impactSeq: didImpact ? state.impactSeq + 1 : state.impactSeq,
       };
     }

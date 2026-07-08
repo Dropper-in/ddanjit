@@ -11,6 +11,7 @@ import { useGifRecorder } from '../model/useGifRecorder';
 import { StageArea } from './StageArea';
 import { Toolbar } from './Toolbar';
 import { GifPreviewDialog } from './GifPreviewDialog';
+import { STAGE_REF } from './canvasConfig';
 
 const DOM_TARGET = parseInt(styles.domTarget);
 const JELLY_DURATION = parseInt(styles.jellyDuration);
@@ -101,10 +102,10 @@ export function StoneThrower() {
 
   useEffect(() => {
     if (game.impactSeq === 0) return;
-    setShake((s) => s + 1);
+    setShake(1);
     setReactionFrame((f) => f + 1);
     jellyStartRef.current = performance.now();
-    const shakeTimeout = setTimeout(() => setShake((prev) => Math.max(0, prev - 1)), 220);
+    const shakeTimeout = setTimeout(() => setShake(0), 220);
     return () => clearTimeout(shakeTimeout);
   }, [game.impactSeq]);
 
@@ -112,8 +113,7 @@ export function StoneThrower() {
     const rect = targetRef.current!.getBoundingClientRect();
     const ammo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId)!;
     // stage 너비 비례 — REF(512) 기준. 캐릭터(stage*0.7)와 같은 비율로 스케일.
-    const SIZE_REF = 512;
-    const size = ammo.size * (rect.width / SIZE_REF);
+    const size = ammo.size * (rect.width / STAGE_REF);
     dispatch({
       type: 'fire',
       projectile: {
@@ -121,7 +121,7 @@ export function StoneThrower() {
         type: ammo,
         phase: 'flight',
         frame: 0,
-        flightFrames: Math.round(14 - ((Math.random() * 30) / 30) * 6),
+        flightFrames: Math.round(14 - Math.random() * 6),
         size,
         tx,
         ty,

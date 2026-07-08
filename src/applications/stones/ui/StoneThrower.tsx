@@ -89,15 +89,34 @@ export function StoneThrower() {
     if (characterUrl) preload(characterUrl);
   }, [characterUrl, preload]);
 
+  // 언마운트 시 현재 characterUrl blob revoke — characterUrlRef 미러로 stale 클로저 방지
+  useEffect(() => {
+    return () => {
+      if (characterUrlRef.current) URL.revokeObjectURL(characterUrlRef.current);
+    };
+  }, []);
+
   useEffect(() => {
     if (projectiles.length === 0) return;
-    const id = setInterval(() => {
-      dispatch({
-        type: 'tick',
-        targetWidth: targetRef.current?.getBoundingClientRect().width ?? 320,
-      });
-    }, 30);
-    return () => clearInterval(id);
+    let raf = 0;
+    let last = performance.now();
+    let acc = 0;
+    const STEP = 30;
+    const loop = (now: number) => {
+      acc += now - last;
+      last = now;
+      // 백그라운드 복귀 시 누산 폭주 방지 — 최대 5스텝만 소화
+      acc = Math.min(acc, STEP * 5);
+      // getBoundingClientRect는 스텝당 동일 — 루프 밖으로 hoist
+      const targetWidth = targetRef.current?.getBoundingClientRect().width ?? 320;
+      while (acc >= STEP) {
+        dispatch({ type: 'tick', targetWidth });
+        acc -= STEP;
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
   }, [projectiles.length]);
 
   useEffect(() => {
@@ -204,26 +223,31 @@ export function StoneThrower() {
       const natW = img.naturalWidth,
         natH = img.naturalHeight;
 
-      // 원본을 캔버스에 그린 뒤 투명 여백 자동 크롭 (알파 바운딩박스)
+      // 알파 스캔은 최대 변 1024로 다운스케일한 캔버스에서 수행 (메인 스레드 블로킹 방지).
+      // 바운딩박스는 스캔 좌표계 기준으로 구한 뒤 원본 좌표로 환산해 원본에서 크롭.
+      const SCAN_MAX = 1024;
+      const scanScale = Math.max(natW, natH) > SCAN_MAX ? SCAN_MAX / Math.max(natW, natH) : 1;
+      const scanW = Math.max(1, Math.round(natW * scanScale));
+      const scanH = Math.max(1, Math.round(natH * scanScale));
       const src = document.createElement('canvas');
-      src.width = natW;
-      src.height = natH;
+      src.width = scanW;
+      src.height = scanH;
       const sctx = src.getContext('2d')!;
-      sctx.drawImage(img, 0, 0);
+      sctx.drawImage(img, 0, 0, scanW, scanH);
       let cropX = 0,
         cropY = 0,
         cropW = natW,
         cropH = natH;
       try {
-        const { data } = sctx.getImageData(0, 0, natW, natH);
+        const { data } = sctx.getImageData(0, 0, scanW, scanH);
         const ALPHA = 10; // 이보다 불투명한 픽셀만 내용으로 간주
-        let minX = natW,
-          minY = natH,
+        let minX = scanW,
+          minY = scanH,
           maxX = -1,
           maxY = -1;
-        for (let y = 0; y < natH; y++) {
-          for (let x = 0; x < natW; x++) {
-            if (data[(y * natW + x) * 4 + 3] > ALPHA) {
+        for (let y = 0; y < scanH; y++) {
+          for (let x = 0; x < scanW; x++) {
+            if (data[(y * scanW + x) * 4 + 3] > ALPHA) {
               if (x < minX) minX = x;
               if (x > maxX) maxX = x;
               if (y < minY) minY = y;
@@ -232,12 +256,19 @@ export function StoneThrower() {
           }
         }
         if (maxX >= minX && maxY >= minY) {
-          // 가장자리 안티앨리어싱 보존용 소량 패딩
-          const pad = Math.round(Math.max(maxX - minX, maxY - minY) * 0.02);
-          cropX = Math.max(0, minX - pad);
-          cropY = Math.max(0, minY - pad);
-          cropW = Math.min(natW - 1, maxX + pad) - cropX + 1;
-          cropH = Math.min(natH - 1, maxY + pad) - cropY + 1;
+          // 스캔 좌표 → 원본 좌표 환산 (scale = natW / scanW)
+          const scaleX = natW / scanW;
+          const scaleY = natH / scanH;
+          const oMinX = minX * scaleX,
+            oMinY = minY * scaleY,
+            oMaxX = maxX * scaleX,
+            oMaxY = maxY * scaleY;
+          // 가장자리 안티앨리어싱 보존용 소량 패딩 (환산 좌표 기준)
+          const pad = Math.round(Math.max(oMaxX - oMinX, oMaxY - oMinY) * 0.02);
+          cropX = Math.max(0, Math.floor(oMinX - pad));
+          cropY = Math.max(0, Math.floor(oMinY - pad));
+          cropW = Math.min(natW - 1, Math.ceil(oMaxX + pad)) - cropX + 1;
+          cropH = Math.min(natH - 1, Math.ceil(oMaxY + pad)) - cropY + 1;
         }
       } catch {
         // 교차출처 등으로 캔버스가 tainted면 크롭 생략, 원본 사용
@@ -259,10 +290,23 @@ export function StoneThrower() {
       const cvs = document.createElement('canvas');
       cvs.width = width;
       cvs.height = height;
-      cvs.getContext('2d')!.drawImage(src, cropX, cropY, cropW, cropH, 0, 0, width, height);
+      // 크롭은 다운스케일 스캔본이 아니라 원본 이미지에서 (환산 좌표 기준)
+      cvs.getContext('2d')!.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, width, height);
       imgDimsRef.current = { width, height };
       setImgDims({ width, height });
-      setCharacterUrl(cvs.toDataURL('image/webp', 0.85));
+      cvs.toBlob(
+        (blob) => {
+          if (!blob) return;
+          const next = URL.createObjectURL(blob);
+          // 교체 시 이전 characterUrl revoke (blob 누수 방지)
+          setCharacterUrl((old) => {
+            if (old) URL.revokeObjectURL(old);
+            return next;
+          });
+        },
+        'image/webp',
+        0.85,
+      );
       dispatch({ type: 'clear_stuck' });
     };
     img.src = raw;

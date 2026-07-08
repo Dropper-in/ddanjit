@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Checkbox } from '@/shared/ui/form-field';
 import { AMMO_TYPES } from '../model/constants';
 import { AmmoDropdown } from './AmmoDropdown';
@@ -10,7 +11,12 @@ interface Props {
   onShowReactionChange: (v: boolean) => void;
 }
 
-export function Toolbar({ ammoId, onAmmoChange, showReaction, onShowReactionChange }: Props) {
+export const Toolbar = memo(function Toolbar({
+  ammoId,
+  onAmmoChange,
+  showReaction,
+  onShowReactionChange,
+}: Props) {
   return (
     <div className="st-toolbar">
       <div className="st-ammo-row">
@@ -38,4 +44,4 @@ export function Toolbar({ ammoId, onAmmoChange, showReaction, onShowReactionChan
       </Checkbox>
     </div>
   );
-}
+});

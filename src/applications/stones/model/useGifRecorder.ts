@@ -13,7 +13,7 @@ import {
   wobbleRotation,
   jellyTransform,
 } from '../ui/canvasConfig';
-import type { GameState } from './types';
+import type { FrameSnapshot } from './types';
 
 async function prerenderEmoji(emoji: string, size: number): Promise<HTMLCanvasElement> {
   // Mona Emoji는 12px 픽셀 폰트 → 1:1 prerender 후 nearest neighbor 스케일
@@ -83,16 +83,12 @@ function imgSourceHeight(src: CanvasImageSource): number {
 export type GifRecorderRefs = {
   hiddenCanvas: React.RefObject<HTMLCanvasElement | null>;
   target: React.RefObject<HTMLDivElement | null>;
+  // 렌더 주기와 동기화되는 state 파생 값 묶음 — StoneThrower가 매 렌더 한 번에 갱신
+  snapshot: React.MutableRefObject<FrameSnapshot>;
+  // 렌더 주기 밖에서 갱신되는 값들은 개별 ref로 유지 (snapshot에 넣으면 stale)
   imgDims: React.MutableRefObject<{ width: number; height: number }>;
-  game: React.MutableRefObject<GameState>;
-  shake: React.MutableRefObject<number>;
-  reactionFrame: React.MutableRefObject<number>;
-  characterUrl: React.MutableRefObject<string>;
-  shotCount: React.MutableRefObject<number>;
-  ammoId: React.MutableRefObject<string>;
   throwing: React.MutableRefObject<boolean>;
   jellyStart: React.MutableRefObject<number>;
-  showReaction: React.MutableRefObject<boolean>;
   jellyDuration: number;
   wobbleDuration: number;
   domTargetSize: number;
@@ -106,18 +102,9 @@ function drawFrame(
   imgCache: Map<string, CanvasImageSource>,
   theme: ThemeSnapshot,
 ) {
-  const {
-    imgDims,
-    game,
-    shake,
-    reactionFrame,
-    characterUrl,
-    shotCount,
-    ammoId,
-    throwing,
-    jellyStart,
-    target,
-  } = refs;
+  const { imgDims, throwing, jellyStart, target } = refs;
+  const { game, shake, reactionFrame, characterUrl, shotCount, ammoId, showReaction } =
+    refs.snapshot.current;
   const { width: rawWidth, height: rawHeight } = imgDims.current;
 
   let imgWidth = rawWidth,
@@ -195,7 +182,7 @@ function drawFrame(
   const offsetY = contentY + (imgHeight - canvasTarget) / 2;
 
   // character
-  const charImg = imgCache.get(characterUrl.current);
+  const charImg = imgCache.get(characterUrl);
   if (charImg) {
     const elapsed = performance.now() - jellyStart.current;
     const { sx, sy, skx } = jellyTransform(Math.min(elapsed / refs.jellyDuration, 1));
@@ -219,7 +206,7 @@ function drawFrame(
   }
 
   // stuck items
-  for (const stuckItem of game.current.stuck) {
+  for (const stuckItem of game.stuck) {
     const stuckSize = stuckItem.size * coordScale;
     const cx = offsetX + stuckItem.x * coordScale;
     const cy = offsetY + stuckItem.y * coordScale;
@@ -240,7 +227,7 @@ function drawFrame(
   }
 
   // projectiles
-  for (const projectile of game.current.projectiles) {
+  for (const projectile of game.projectiles) {
     const size = projectile.size * coordScale;
     let drawX: number, drawY: number, rotation: number;
     if (projectile.phase === 'flight') {
@@ -277,10 +264,10 @@ function drawFrame(
   }
 
   // reaction bubble
-  if (shake.current > 0 && refs.showReaction.current) {
-    const curAmmo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId.current);
+  if (shake > 0 && showReaction) {
+    const curAmmo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId);
     const reactions = getReactions(curAmmo ? (curAmmo.happy ?? curAmmo.sticks) : false);
-    const expression = reactions[reactionFrame.current % reactions.length];
+    const expression = reactions[reactionFrame % reactions.length];
     ctx.font = 'bold 18px Mona, monospace';
     const textWidth = ctx.measureText(expression).width;
     const padX = 8,
@@ -310,7 +297,7 @@ function drawFrame(
   ctx.fillStyle = bevelXlo;
   ctx.fillRect(footerX, footerY, imgWidth, 1);
 
-  const curAmmo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId.current)!;
+  const curAmmo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId)!;
   const FONT_SIZE = 14;
   const ICON_SIZE = 18;
   const isPressed = throwing.current;
@@ -352,7 +339,7 @@ function drawFrame(
   }
   ctx.fillText(buttonLabel, buttonContentX, buttonContentY);
 
-  const statsText = `${shotCount.current}회 던짐`;
+  const statsText = `${shotCount}회 던짐`;
   const statsRightEdge = footerX + imgWidth - 8;
   const statsAvail = statsRightEdge - (buttonX + buttonWidth + 8);
   if (statsAvail > 20) {

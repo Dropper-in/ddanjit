@@ -8,6 +8,7 @@ import styles from './Stones.module.scss';
 import { AMMO_TYPES, getReactions } from '../model/constants';
 import { gameReducer } from '../model/reducer';
 import { useGifRecorder } from '../model/useGifRecorder';
+import type { FrameSnapshot } from '../model/types';
 import { StageArea } from './StageArea';
 import { Toolbar } from './Toolbar';
 import { GifPreviewDialog } from './GifPreviewDialog';
@@ -34,25 +35,30 @@ export function StoneThrower() {
   const targetRef = useRef<HTMLDivElement>(null);
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
   const nextId = useRef(0);
+  // 렌더 주기 밖에서 갱신되는 값 — snapshot에 넣으면 stale이라 개별 ref 유지
   const jellyStartRef = useRef(0);
   const throwingRef = useRef(false);
   const imgDimsRef = useRef({ width: 512, height: 512 });
 
-  // snapshot refs to avoid stale closures in recording interval
-  const gameRef = useRef(game);
-  const shakeRef = useRef(shake);
-  const reactionFrameRef = useRef(reactionFrame);
-  const characterUrlRef = useRef(characterUrl);
-  const shotCountRef = useRef(shotCount);
-  const ammoIdRef = useRef(ammoId);
-  const showReactionRef = useRef(showReaction);
-  gameRef.current = game;
-  shakeRef.current = shake;
-  reactionFrameRef.current = reactionFrame;
-  characterUrlRef.current = characterUrl;
-  shotCountRef.current = shotCount;
-  ammoIdRef.current = ammoId;
-  showReactionRef.current = showReaction;
+  // 녹화 interval의 stale 클로저 방지용 렌더 스냅샷 — 매 렌더 한 번에 갱신
+  const snapshotRef = useRef<FrameSnapshot>({
+    game,
+    shake,
+    reactionFrame,
+    characterUrl,
+    shotCount,
+    ammoId,
+    showReaction,
+  });
+  snapshotRef.current = {
+    game,
+    shake,
+    reactionFrame,
+    characterUrl,
+    shotCount,
+    ammoId,
+    showReaction,
+  };
 
   const {
     recording,
@@ -66,16 +72,10 @@ export function StoneThrower() {
   } = useGifRecorder({
     hiddenCanvas: hiddenCanvasRef,
     target: targetRef,
+    snapshot: snapshotRef,
     imgDims: imgDimsRef,
-    game: gameRef,
-    shake: shakeRef,
-    reactionFrame: reactionFrameRef,
-    characterUrl: characterUrlRef,
-    shotCount: shotCountRef,
-    ammoId: ammoIdRef,
     throwing: throwingRef,
     jellyStart: jellyStartRef,
-    showReaction: showReactionRef,
     jellyDuration: JELLY_DURATION,
     wobbleDuration: WOBBLE_DURATION,
     domTargetSize: DOM_TARGET,
@@ -89,10 +89,11 @@ export function StoneThrower() {
     if (characterUrl) preload(characterUrl);
   }, [characterUrl, preload]);
 
-  // 언마운트 시 현재 characterUrl blob revoke — characterUrlRef 미러로 stale 클로저 방지
+  // 언마운트 시 현재 characterUrl blob revoke — snapshot 미러로 stale 클로저 방지
   useEffect(() => {
     return () => {
-      if (characterUrlRef.current) URL.revokeObjectURL(characterUrlRef.current);
+      const url = snapshotRef.current.characterUrl;
+      if (url) URL.revokeObjectURL(url);
     };
   }, []);
 

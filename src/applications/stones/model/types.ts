@@ -52,3 +52,19 @@ export type GameAction =
   | { type: 'fire'; projectile: Projectile } // 새 발사체 추가
   | { type: 'reset' } // 게임 초기화
   | { type: 'clear_stuck' }; // 박힌 탄약만 제거
+
+/**
+ * GIF drawFrame이 읽는 렌더 스냅샷 — StoneThrower가 매 렌더 갱신.
+ * 렌더 주기와 동기화되는 state 파생 값만 포함한다.
+ * throwing/jellyStart(렌더 외부에서 갱신)와 imgDims(업로드 onload 콜백에서
+ * 렌더 전에 갱신)는 stale 위험이 있어 여기 넣지 않고 개별 ref로 유지한다.
+ */
+export interface FrameSnapshot {
+  game: GameState;
+  shake: number;
+  reactionFrame: number;
+  characterUrl: string;
+  shotCount: number;
+  ammoId: string;
+  showReaction: boolean;
+}

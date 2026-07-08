@@ -29,11 +29,11 @@ export function Button({
   title,
 }: ButtonProps) {
   const iconSrc = resolveIcon(icon);
-  // 'rpp-btn' 글로벌 클래스 유지 — _apps.scss 복합 셀렉터(.rpp-btn.dd-hero-cta 등) 타겟용 훅
+  // 'ui-btn' 글로벌 클래스 유지 — _apps.scss/stones.global.scss 복합 셀렉터(.ui-btn.dd-hero-cta, .ui-btn.st-throw 등) 타겟용 훅
   return (
     <button
       type={type}
-      className={cx(styles.btn, 'rpp-btn', className)}
+      className={cx(styles.btn, 'ui-btn', className)}
       data-default={isDefault ? 'true' : 'false'}
       data-pressed={pressed === undefined ? undefined : pressed ? 'true' : 'false'}
       disabled={disabled}

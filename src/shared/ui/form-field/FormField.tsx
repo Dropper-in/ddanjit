@@ -11,7 +11,7 @@ import { cx } from '@/shared/lib/ui';
 import styles from './FormField.module.scss';
 
 // 모든 폼 필드 — Win98 스타일 (paper + bevel-in).
-// TextInput/Textarea/Select는 글로벌 'rpp-field' 훅 사용 (기존 _shared.scss + _apps.scss override 호환).
+// TextInput/Textarea/Select는 글로벌 'ui-field' 훅 사용 (기존 _shared.scss + _apps.scss override 호환).
 
 export interface TextInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   type?: 'text' | 'number' | 'search' | 'email' | 'password' | 'url' | 'tel';
@@ -21,7 +21,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
   { className, type = 'text', ...rest },
   ref,
 ) {
-  return <input ref={ref} type={type} className={cx('rpp-field', className)} {...rest} />;
+  return <input ref={ref} type={type} className={cx('ui-field', className)} {...rest} />;
 });
 
 export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {}
@@ -30,7 +30,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   { className, ...rest },
   ref,
 ) {
-  return <textarea ref={ref} className={cx('rpp-field', className)} {...rest} />;
+  return <textarea ref={ref} className={cx('ui-field', className)} {...rest} />;
 });
 
 export interface SelectOption {
@@ -47,7 +47,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   ref,
 ) {
   return (
-    <select ref={ref} className={cx('rpp-field', className)} {...rest}>
+    <select ref={ref} className={cx('ui-field', className)} {...rest}>
       {options.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}

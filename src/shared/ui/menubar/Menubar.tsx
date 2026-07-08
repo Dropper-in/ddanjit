@@ -117,12 +117,12 @@ export function MenuButton({
   const style: CSSProperties | undefined = width !== undefined ? { width } : undefined;
 
   return (
-    // rpp-menubtn 글로벌 훅 유지 — _apps.scss dd-input-compact 복합 셀렉터용
-    <div className={cx(styles.menubtn, 'rpp-menubtn', className)} ref={ref} style={style}>
+    // ui-menubtn 글로벌 훅 유지 — _apps.scss dd-input-compact 복합 셀렉터용
+    <div className={cx(styles.menubtn, 'ui-menubtn', className)} ref={ref} style={style}>
       <button
         type="button"
-        // rpp-menubtn-trigger 글로벌 훅 유지 — _apps.scss 복합 셀렉터용
-        className={cx(styles.trigger, 'rpp-menubtn-trigger', open ? styles.open : undefined)}
+        // ui-menubtn-trigger 글로벌 훅 유지 — _apps.scss 복합 셀렉터용
+        className={cx(styles.trigger, 'ui-menubtn-trigger', open ? styles.open : undefined)}
         onMouseDown={(e) => {
           e.preventDefault();
           setOpen((o) => !o);

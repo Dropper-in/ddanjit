@@ -1,5 +1,11 @@
 @use 'mixins' as *;
 
+// ============================================================
+// WIP tangent 전용 (dd-*, 딴짓.txt 앱).
+// 앱이 아직 shared 스타일에 얹혀 있는 상태 — 앱 부활 시 슬라이스로 이동.
+// stones(st-*)는 stones/ui/stones.global.scss로 이동 완료.
+// ============================================================
+
 // CRT 테마: dd-x 버튼 색상 오버라이드 (_components.scss에서 이동)
 [data-theme='crt'] .dd-x {
   color: var(--ink);
@@ -42,15 +48,15 @@
     align-self: flex-start;
 
     select,
-    .rpp-menubtn,
-    .rpp-menubtn-trigger,
+    .ui-menubtn,
+    .ui-menubtn-trigger,
     .dd-newtag-input {
       flex: 0 0 auto;
       height: 32px;
       width: 100%;
     }
 
-    .rpp-btn {
+    .ui-btn {
       width: 100%;
       min-width: 0;
     }
@@ -124,7 +130,7 @@
   }
 }
 
-.rpp-btn.dd-hero-cta {
+.ui-btn.dd-hero-cta {
   font-size: 16px;
   font-weight: 700;
   padding: 14px 28px;
@@ -197,7 +203,7 @@
   color: var(--ink) !important;
 }
 
-.rpp-btn.dd-mini-random {
+.ui-btn.dd-mini-random {
   font-weight: 700;
 }
 
@@ -293,436 +299,9 @@
 }
 
 // ============================================================
-// APP: 사랑하는아이에게돌을던져보세요...exe (stones)
-// ============================================================
-.st-app {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  background: var(--chrome);
-}
-
-.st-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  background: var(--chrome);
-  box-shadow:
-    inset 0 -1px 0 0 var(--bevel-lo),
-    inset 0 1px 0 0 var(--bevel-hi);
-  flex: 0 0 auto;
-}
-
-.st-toolbar-label {
-  font-size: 11px;
-  color: var(--ink-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-
-  .dim {
-    text-transform: none;
-    letter-spacing: 0;
-  }
-}
-
-.st-ammo-row {
-  display: flex;
-  gap: 2px;
-}
-
-.st-ammo-btn {
-  font-family: 'Mona', monospace;
-  font-size: 11px;
-  background: var(--chrome);
-  color: var(--ink);
-  box-shadow: var(--bevel-out);
-  border: 0;
-  padding: 3px 8px;
-  cursor: default;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-
-  &.selected {
-    box-shadow: var(--bevel-in);
-    padding-top: 4px;
-    padding-left: 9px;
-    padding-bottom: 2px;
-    padding-right: 7px;
-  }
-
-  img {
-    image-rendering: pixelated;
-  }
-}
-
-.st-stage {
-  flex: 1;
-  min-height: 240px;
-  background: var(--paper);
-  box-shadow: var(--bevel-in);
-  margin: 4px 8px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  cursor: pointer; // 스테이지 클릭 = 제물(캐릭터) 이미지 교체
-}
-
-// 교체 가능 힌트 — 평소 흐릿, hover 시 또렷. DOM 전용이라 녹화 GIF엔 안 들어감
-.st-stage-hint {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  padding: 2px 8px;
-  font-size: 11px;
-  white-space: nowrap;
-  color: var(--ink-dim);
-  background: var(--paper);
-  box-shadow: var(--bevel-out);
-  pointer-events: none;
-  opacity: 0.45;
-  transition: opacity 120ms;
-}
-
-.st-stage:hover .st-stage-hint {
-  opacity: 1;
-}
-
-.st-target {
-  position: relative;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 60ms steps(2);
-
-  > div:not(.st-reaction),
-  > div:not(.st-reaction) > div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.st-character {
-  width: 70%;
-  height: 70%;
-  image-rendering: pixelated;
-  user-select: none;
-  -webkit-user-drag: none;
-  object-fit: contain;
-}
-
-// 제물 미업로드 시 드롭존 — 클릭해서 이미지 올리라고 명확히 안내
-.st-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  width: 72%;
-  aspect-ratio: 1;
-  padding: 16px;
-  color: var(--ink-dim);
-  font-family: 'Mona', monospace;
-  text-align: center;
-  user-select: none;
-  transition: color 120ms;
-}
-
-.st-placeholder-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  font-size: 40px;
-  font-weight: 700;
-  line-height: 1;
-  border: 3px dashed var(--bevel-lo);
-  transition: border-color 120ms;
-}
-
-.st-placeholder-text {
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-// 스테이지 hover 시 드롭존 또렷하게 — 클릭 가능 강조
-.st-stage:hover .st-placeholder {
-  color: var(--ink);
-}
-
-.st-stage:hover .st-placeholder-icon {
-  border-color: var(--ink);
-}
-
-.st-action-bar {
-  display: flex;
-  align-items: stretch;
-  gap: 6px;
-  padding: 8px 12px;
-  background: var(--chrome);
-  box-shadow: inset 0 1px 0 0 var(--bevel-hi);
-  flex: 0 0 auto;
-
-  .st-throw {
-    flex: 1;
-  }
-}
-
-.rpp-btn.st-throw {
-  font-size: 16px;
-  font-weight: 700;
-  padding: 12px 24px;
-  min-width: 0;
-
-  &:not(:disabled):active {
-    padding-top: 13px;
-    padding-left: 25px;
-    padding-bottom: 11px;
-    padding-right: 23px;
-  }
-}
-
-.st-stuck {
-  position: absolute;
-  pointer-events: none;
-  image-rendering: pixelated;
-  width: 16px;
-  height: 16px;
-}
-
-.st-reaction {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: var(--paper);
-  box-shadow: var(--bevel-thin);
-  border: 1px solid var(--ink);
-  padding: 4px 8px;
-  font-family: 'Mona', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--ink);
-  animation: st-pop 200ms steps(2);
-}
-
-@keyframes st-pop {
-  from {
-    transform: scale(0.8);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-.st-hint {
-  font-family: 'Mona Small', 'Mona', monospace;
-  font-size: 11px;
-  color: var(--ink-dim);
-  text-align: center;
-  padding: 0 12px 12px;
-  background: var(--chrome);
-  flex: 0 0 auto;
-}
-
-.st-slider-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-}
-
-.st-slider {
-  width: 100px;
-}
-
-.rpp-btn.is-recording {
-  background: var(--accent-red);
-  color: var(--paper);
-
-  &::before {
-    content: '●';
-    margin-right: 4px;
-    animation: rec-blink 1s steps(2) infinite;
-  }
-}
-
-@keyframes rec-blink {
-  50% {
-    opacity: 0;
-  }
-}
-
-// Custom ammo dropdown (mobile only) — trigger는 native select와 동일 (paper + bevel-in)
-.st-ammo-dropdown {
-  display: none;
-  position: relative;
-}
-
-.st-ammo-trigger {
-  background: var(--paper);
-  color: var(--ink);
-  box-shadow: var(--bevel-in);
-  border: 0;
-  height: 32px;
-  padding: 0 24px 0 8px;
-  font-family: 'Mona', monospace;
-  font-size: 13px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: default;
-  position: relative;
-  min-width: 160px;
-  text-align: left;
-  white-space: nowrap;
-
-  img {
-    image-rendering: pixelated;
-    flex: 0 0 auto;
-  }
-
-  .caret {
-    position: absolute;
-    right: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 11px;
-    pointer-events: none;
-  }
-
-  .dim {
-    color: var(--ink-dim);
-  }
-}
-
-.st-ammo-trigger-label {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.st-ammo-menu {
-  position: absolute;
-  top: calc(100% + 2px);
-  left: 0;
-  background: var(--paper);
-  color: var(--ink);
-  box-shadow:
-    var(--bevel-out),
-    2px 2px 0 0 var(--bevel-xlo);
-  padding: 2px;
-  z-index: 50;
-  min-width: 200px;
-  font-family: 'Mona', monospace;
-  font-size: 13px;
-
-  .row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    cursor: default;
-    white-space: nowrap;
-
-    &:hover {
-      background: var(--select);
-      color: var(--select-fg);
-
-      .dim {
-        color: var(--select-fg);
-        opacity: 0.85;
-      }
-    }
-
-    &.selected {
-      font-weight: 700;
-    }
-
-    img {
-      image-rendering: pixelated;
-    }
-  }
-
-  .dim {
-    margin-left: auto;
-    opacity: 0.7;
-    font-size: 11px;
-    color: var(--ink-dim);
-  }
-}
-
-// ============================================================
-// Mobile patches
+// Mobile patches (tangent 전용)
 // ============================================================
 @include mobile {
-  .st-toolbar .st-ammo-row {
-    display: none;
-  }
-
-  .st-ammo-dropdown {
-    display: inline-block;
-  }
-
-  .st-ammo-trigger {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .st-ammo-trigger-label {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .st-action-bar {
-    flex-wrap: wrap;
-    gap: 6px;
-
-    // 던지기 단독 상단 줄, 초기화 + 녹화는 하단 줄 분할
-    .st-throw {
-      flex: 1 1 100%;
-      order: -1;
-    }
-
-    > .rpp-btn:not(.st-throw) {
-      flex: 1 1 calc(50% - 3px);
-      min-width: 0;
-      padding: 8px 6px;
-      font-size: 12px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-  .st-slider-label {
-    flex: 1 1 100%;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 13px;
-  }
-
-  .st-slider {
-    flex: 1;
-    min-width: 0;
-  }
-
   .dd-textarea {
     min-height: 64px;
     font-size: 14px;
@@ -746,24 +325,5 @@
     width: 22px;
     height: 22px;
     font-size: 13px;
-  }
-
-  .st-ammo-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-
-    img {
-      width: 20px;
-      height: 20px;
-    }
-  }
-
-  .st-stuck {
-    width: 22px;
-    height: 22px;
-  }
-
-  .st-slider {
-    width: 80px;
   }
 }

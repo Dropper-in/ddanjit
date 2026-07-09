@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type React from 'react';
-import { AMMO_TYPES, getReactions } from './constants';
+import { AMMO_TYPES, ARC_HEIGHT, getReactions } from './constants';
 import { loadImg } from './imageUtils';
 import {
   GIF_TITLEBAR_H,
@@ -236,7 +236,7 @@ function drawFrame(
       drawY =
         (projectile.sy +
           (projectile.ty - projectile.sy) * flightProgress -
-          Math.sin(flightProgress * Math.PI) * 130) *
+          Math.sin(flightProgress * Math.PI) * ARC_HEIGHT) *
         coordScale;
       rotation = projectile.frame * 30;
     } else {

@@ -48,6 +48,12 @@ export const AMMO_TYPES: AmmoType[] = [
 export const FLIGHT_FRAMES = 12;
 export const BOUNCE_FRAMES = 44;
 
+/** 비행 궤적 사인 아크 높이(px) — 렌더(StageArea·GIF)와 물리(reducer 도착속도)가 공유 */
+export const ARC_HEIGHT = 130;
+// 튕김 물리: 도착 속도 기반 반사. RESTITUTION > 1 = 물리보다 과장된 반발(손맛), 중력↑ = 낙하 스냅
+export const RESTITUTION = 1.35;
+export const BOUNCE_GRAVITY = 1.05;
+
 export function getReactions(happy: boolean): string[] {
   return happy ? ['♥', '><', '꺅', 'ㅋ', '헤헤'] : ['ㅠㅠ', '><', 'ㅜㅜ', '헉', '악'];
 }

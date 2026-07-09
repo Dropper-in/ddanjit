@@ -1,4 +1,5 @@
 import type React from 'react';
+import { ARC_HEIGHT } from '../model/constants';
 import type { Projectile, StuckItem } from '../model/types';
 import styles from './Stones.module.scss';
 
@@ -107,7 +108,7 @@ export function StageArea({
             drawY =
               projectile.sy +
               (projectile.ty - projectile.sy) * flightProgress -
-              Math.sin(flightProgress * Math.PI) * 130;
+              Math.sin(flightProgress * Math.PI) * ARC_HEIGHT;
             rotation = projectile.frame * 30;
           } else {
             drawX = projectile.x;

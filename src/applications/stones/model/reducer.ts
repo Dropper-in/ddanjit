@@ -1,5 +1,5 @@
 import type { GameState, GameAction, Projectile, StuckItem } from './types';
-import { BOUNCE_FRAMES } from './constants';
+import { ARC_HEIGHT, BOUNCE_FRAMES, BOUNCE_GRAVITY, RESTITUTION } from './constants';
 
 // tick: 모든 발사체 1프레임 진행, 착탄 시 박힘/튕김 분기
 // fire: 새 발사체 추가 (StoneThrower가 fireAt 호출 시)
@@ -29,16 +29,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
                 type: projectile.type,
               });
             } else {
-              const dir = (projectile.tx >= centerX ? 1 : -1) * (0.6 + Math.random() * 0.8);
-              const speed = 9 + Math.random() * 8;
+              // 도착 속도(비행 궤적의 p=1 미분)를 반사 — 던지기 세기·스테이지 크기에 비례해 튕김
+              const lastFrame = projectile.flightFrames - 1;
+              const inVx = (projectile.tx - projectile.sx) / lastFrame;
+              const inVy =
+                (projectile.ty - projectile.sy) / lastFrame + (Math.PI * ARC_HEIGHT) / lastFrame;
+              const speed = Math.hypot(inVx, inVy) * RESTITUTION;
+              const dir = projectile.tx >= centerX ? 1 : -1;
               next.push({
                 ...projectile,
                 phase: 'bounce',
                 bounceFrame: 0,
                 x: projectile.tx,
                 y: projectile.ty,
-                vx: dir * speed,
-                vy: -(7 + Math.random() * 6),
+                vx: dir * speed * (0.55 + Math.random() * 0.5),
+                vy: -speed * (0.6 + Math.random() * 0.45),
                 rotVel: (Math.random() - 0.5) * 80,
               });
             }
@@ -50,7 +55,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             bounceFrame: projectile.bounceFrame + 1,
             x: projectile.x + projectile.vx,
             y: projectile.y + projectile.vy,
-            vy: projectile.vy + 0.7,
+            vy: projectile.vy + BOUNCE_GRAVITY,
             vx: projectile.vx * 0.988,
             rot: projectile.rot + projectile.rotVel,
           });

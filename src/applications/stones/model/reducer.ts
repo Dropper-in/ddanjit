@@ -1,5 +1,13 @@
 import type { GameState, GameAction, Projectile, StuckItem } from './types';
-import { ARC_HEIGHT, BOUNCE_FRAMES, BOUNCE_GRAVITY, RESTITUTION } from './constants';
+import {
+  ARC_HEIGHT,
+  BOUNCE_ANGLE_MAX,
+  BOUNCE_ANGLE_MIN,
+  BOUNCE_FRAMES,
+  BOUNCE_GRAVITY,
+  MIN_BOUNCE_SPEED,
+  RESTITUTION,
+} from './constants';
 
 // tick: 모든 발사체 1프레임 진행, 착탄 시 박힘/튕김 분기
 // fire: 새 발사체 추가 (StoneThrower가 fireAt 호출 시)
@@ -34,7 +42,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
               const inVx = (projectile.tx - projectile.sx) / lastFrame;
               const inVy =
                 (projectile.ty - projectile.sy) / lastFrame + (Math.PI * ARC_HEIGHT) / lastFrame;
-              const speed = Math.hypot(inVx, inVy) * RESTITUTION;
+              const speed = Math.max(Math.hypot(inVx, inVy) * RESTITUTION, MIN_BOUNCE_SPEED);
+              // 반사각을 직접 추첨 — 낮은 리코셰부터 높은 팝까지 매번 다른 궤적
+              const angle =
+                ((BOUNCE_ANGLE_MIN + Math.random() * (BOUNCE_ANGLE_MAX - BOUNCE_ANGLE_MIN)) *
+                  Math.PI) /
+                180;
               const dir = projectile.tx >= centerX ? 1 : -1;
               next.push({
                 ...projectile,
@@ -42,8 +55,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
                 bounceFrame: 0,
                 x: projectile.tx,
                 y: projectile.ty,
-                vx: dir * speed * (0.55 + Math.random() * 0.5),
-                vy: -speed * (0.6 + Math.random() * 0.45),
+                vx: dir * speed * Math.cos(angle),
+                vy: -speed * Math.sin(angle),
                 rotVel: (Math.random() - 0.5) * 80,
               });
             }

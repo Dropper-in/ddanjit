@@ -42,6 +42,7 @@ async function prerenderEmoji(emoji: string, size: number): Promise<HTMLCanvasEl
 type ThemeSnapshot = {
   paper: string;
   ink: string;
+  inkDim: string;
   chrome: string;
   bevelHi: string;
   bevelLo: string;
@@ -57,6 +58,7 @@ function snapshotTheme(): ThemeSnapshot {
   return {
     paper: getCssVar('--paper'),
     ink: getCssVar('--ink'),
+    inkDim: getCssVar('--ink-dim'),
     chrome: getCssVar('--chrome'),
     bevelHi: getCssVar('--bevel-hi'),
     bevelLo: getCssVar('--bevel-lo'),
@@ -133,7 +135,18 @@ function drawFrame(
   if (!ctx) return;
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  const { paper, ink, chrome, bevelHi, bevelLo, bevelXlo, titlebar, titlebar2, titlebarFg } = theme;
+  const {
+    paper,
+    ink,
+    inkDim,
+    chrome,
+    bevelHi,
+    bevelLo,
+    bevelXlo,
+    titlebar,
+    titlebar2,
+    titlebarFg,
+  } = theme;
 
   // bevel border
   ctx.fillStyle = bevelHi;
@@ -287,6 +300,23 @@ function drawFrame(
     ctx.fillText(expression, bubbleX + padX, bubbleY + bubbleHeight / 2);
   }
 
+  // 좌하단 도메인 칩 — 반응 말풍선과 같은 문법(paper + 1px ink 테두리)의 귀여운 태그
+  {
+    const domainText = 'https://ddanjit.today';
+    const chipFontSize = 14;
+    ctx.font = `${chipFontSize}px Mona, monospace`;
+    const chipPadX = 6,
+      chipPadY = 4;
+    const chipWidth = ctx.measureText(domainText).width + chipPadX * 2;
+    const chipHeight = chipFontSize + chipPadY * 2;
+    const chipX = contentX + (imgWidth - chipWidth) / 2;
+    const chipY = contentY + imgHeight - chipHeight - 8;
+    ctx.fillStyle = inkDim;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(domainText, chipX + chipPadX, chipY + chipHeight / 2);
+  }
+
   ctx.restore();
 
   // footer
@@ -361,8 +391,8 @@ function drawFrame(
 export function useGifRecorder(refs: GifRecorderRefs) {
   const [recording, setRecording] = useState(false);
   const [encoding, setEncoding] = useState(false);
-  const [encodingPct, setEncodingPct] = useState(0);
   const [gifUrl, setGifUrl] = useState<string | null>(null);
+  const [encodingPct, setEncodingPct] = useState(0);
 
   const MAX_RECORDING_MS = 10000;
   // 캡처 간격 = GIF 프레임 delay — 반드시 동일 값 (30fps)
@@ -404,6 +434,7 @@ export function useGifRecorder(refs: GifRecorderRefs) {
   const startRecording = useCallback(() => {
     setRecording(true);
     frameCountRef.current = 0;
+    setEncodingPct(0);
     if (!encCanvasRef.current) encCanvasRef.current = document.createElement('canvas');
 
     // 녹화 시작 시 워커 생성 — 프레임은 캡처 즉시 transfer(메인 스레드 상주 제거)
@@ -415,11 +446,13 @@ export function useGifRecorder(refs: GifRecorderRefs) {
     };
     worker.onmessage = (
       e: MessageEvent<
-        { type: 'progress'; percent: number } | { type: 'done'; buffer: ArrayBuffer }
+        { type: 'progress'; processed: number } | { type: 'done'; buffer: ArrayBuffer }
       >,
     ) => {
       if (e.data.type === 'progress') {
-        setEncodingPct(e.data.percent);
+        // 전송 대비 처리 비율 — 녹화 중엔 UI가 숨겨져 있고, 중지 후엔 잔여 큐 소화율
+        const total = Math.max(1, frameCountRef.current);
+        setEncodingPct(Math.min(100, Math.round((e.data.processed / total) * 100)));
         return;
       }
       const url = URL.createObjectURL(new Blob([e.data.buffer], { type: 'image/gif' }));
@@ -452,9 +485,15 @@ export function useGifRecorder(refs: GifRecorderRefs) {
       encCtx.imageSmoothingEnabled = false;
       encCtx.drawImage(canvas, 0, 0);
       const imageData = encCtx.getImageData(0, 0, enc.width, enc.height);
-      // 캡처 즉시 워커로 transfer — framesRef 누적 제거
+      // 캡처 즉시 워커로 transfer — 워커가 도착 즉시 인코딩(스트리밍)
       workerRef.current?.postMessage(
-        { type: 'frame', data: imageData.data, width: enc.width, height: enc.height },
+        {
+          type: 'frame',
+          data: imageData.data,
+          width: enc.width,
+          height: enc.height,
+          delay: FRAME_DELAY_MS,
+        },
         [imageData.data.buffer as ArrayBuffer],
       );
       frameCountRef.current += 1;
@@ -482,9 +521,8 @@ export function useGifRecorder(refs: GifRecorderRefs) {
       return;
     }
     setEncoding(true);
-    setEncodingPct(0);
-    // 프레임은 이미 스트리밍 transfer됨 — finish만 보내면 워커가 인코딩 실행
-    worker.postMessage({ type: 'finish', delay: FRAME_DELAY_MS });
+    // 프레임은 이미 스트리밍 인코딩됨 — finish는 마무리(잔여 큐 처리 + 파일 확정)만
+    worker.postMessage({ type: 'finish' });
   }, []);
 
   stopRecordingRef.current = stopRecording;

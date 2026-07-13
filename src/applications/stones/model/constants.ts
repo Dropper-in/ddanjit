@@ -51,8 +51,13 @@ export const BOUNCE_FRAMES = 44;
 /** 비행 궤적 사인 아크 높이(px) — 렌더(StageArea·GIF)와 물리(reducer 도착속도)가 공유 */
 export const ARC_HEIGHT = 130;
 // 튕김 물리: 도착 속도 기반 반사. RESTITUTION > 1 = 물리보다 과장된 반발(손맛), 중력↑ = 낙하 스냅
-export const RESTITUTION = 1.35;
-export const BOUNCE_GRAVITY = 1.05;
+export const RESTITUTION = 1.5;
+export const BOUNCE_GRAVITY = 1.5;
+/** 반발 속도 하한(px/tick) — 느린 도착(긴 flightFrames·가까운 표적)도 최소 이만큼은 튕김 */
+export const MIN_BOUNCE_SPEED = 18;
+/** 반사각 범위(도) — 낮게 깔리는 리코셰(min)부터 높은 팝(max)까지 균등 랜덤 */
+export const BOUNCE_ANGLE_MIN = 15;
+export const BOUNCE_ANGLE_MAX = 75;
 
 export function getReactions(happy: boolean): string[] {
   return happy ? ['♥', '><', '꺅', 'ㅋ', '헤헤'] : ['ㅠㅠ', '><', 'ㅜㅜ', '헉', '악'];

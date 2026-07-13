@@ -42,7 +42,7 @@ export function DialogRouter({
           </span>
           <br />
           <br />
-          ©2026 딴짓 컴퍼니.
+          ©2026 Dropper-in
         </div>
       </Dialog>
     );
@@ -68,6 +68,36 @@ export function DialogRouter({
           <span className={styles.dialogNote}>
             ...라고 해도, 사실은 끄는 기능이 없으니 농담이에요.
           </span>
+        </div>
+      </Dialog>
+    );
+  }
+  if (dialog.type === 'nag') {
+    const { title, body, note, button } = dialog.msg;
+    return (
+      <Dialog
+        icon="wrench"
+        title={title}
+        onClose={onClose}
+        buttons={
+          <Button isDefault onClick={onClose}>
+            {button ?? '알겠어요'}
+          </Button>
+        }
+      >
+        <div className={styles.dialogBody}>
+          {body.split('\n').map((line, i) => (
+            <span key={i}>
+              {i > 0 && <br />}
+              {line}
+            </span>
+          ))}
+          {note && (
+            <>
+              <br />
+              <span className={styles.dialogNote}>{note}</span>
+            </>
+          )}
         </div>
       </Dialog>
     );

@@ -1,11 +1,21 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { OsDesktop } from '@/os/desktop';
 import { Taskbar } from '@/os/taskbar';
+import { PopupAd } from '@/os/popup-ad';
 import type { Task } from '@/os/taskbar';
 import { Window } from '@/shared/ui/window';
 import { ErrorBoundary } from '@/shared/ui/error-boundary';
-import { APPS, formatClock, FUTURE_SLOTS } from './config';
+import {
+  APPS,
+  formatClock,
+  FUTURE_SLOTS,
+  NAG_FIXED,
+  NAG_RANDOM,
+  NAG_REPEAT_EVERY,
+  NAG_THRESHOLD_1,
+  NAG_THRESHOLD_2,
+} from './config';
 import type { AppId, AppEntry, Spectrum, DialogState } from './config';
 import { DialogRouter } from './DialogRouter';
 import styles from './OsShell.module.scss';
@@ -53,6 +63,17 @@ export default function Home() {
     setOpenAppId(null);
   }
 
+  // 준비중 아이콘 연타 이스터에그 — 50·100회 고정 멘트, 이후 50회마다 랜덤 풀
+  const slotClicks = useRef(0);
+  function onSlotClick() {
+    slotClicks.current += 1;
+    const n = slotClicks.current;
+    if (n === NAG_THRESHOLD_1) setDialog({ type: 'nag', msg: NAG_FIXED[0] });
+    else if (n === NAG_THRESHOLD_2) setDialog({ type: 'nag', msg: NAG_FIXED[1] });
+    else if (n > NAG_THRESHOLD_2 && n % NAG_REPEAT_EVERY === 0)
+      setDialog({ type: 'nag', msg: NAG_RANDOM[Math.floor(Math.random() * NAG_RANDOM.length)] });
+  }
+
   function onStartItem(id: string) {
     setStartOpen(false);
     const appId = APPS.find((app) => app.id === id)?.id;
@@ -84,7 +105,10 @@ export default function Home() {
         onSelect={(id) => setDesktopSel(id as AppId | null)}
         onOpen={openApp}
         futureSlots={FUTURE_SLOTS}
+        onSlotClick={onSlotClick}
       />
+
+      <PopupAd onClaim={() => openApp('stones')} />
 
       {activeApp &&
         (activeApp.fullscreen ? (

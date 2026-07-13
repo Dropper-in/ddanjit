@@ -13,9 +13,18 @@ export interface OsDesktopProps {
   onSelect: (id: string | null) => void;
   onOpen: (id: string) => void;
   futureSlots?: number;
+  /** 준비중 슬롯 클릭 — 연타 이스터에그용 (선택) */
+  onSlotClick?: () => void;
 }
 
-export function OsDesktop({ apps, selectedId, onSelect, onOpen, futureSlots = 3 }: OsDesktopProps) {
+export function OsDesktop({
+  apps,
+  selectedId,
+  onSelect,
+  onOpen,
+  futureSlots = 3,
+  onSlotClick,
+}: OsDesktopProps) {
   const desktopRef = useRef<HTMLDivElement>(null);
   // 앱별 마지막 탭 시각 — 빠른 더블탭도 놓치지 않게 (선택 state 갱신 지연 우회)
   const lastTap = useRef<Record<string, number>>({});
@@ -76,6 +85,8 @@ export function OsDesktop({ apps, selectedId, onSelect, onOpen, futureSlots = 3 
           key={'slot-' + i}
           className={cx(styles.icon, styles.comingSoon)}
           title="아직 만드는 중입니다"
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={onSlotClick}
         >
           <div className={styles.iconInner}>
             <img src={iconUrl('wrench')} alt="" />

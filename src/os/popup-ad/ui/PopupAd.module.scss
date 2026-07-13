@@ -1,0 +1,45 @@
+@use 'mixins' as *;
+
+.popup {
+  position: fixed;
+  right: 8px;
+  bottom: 48px; // 태스크바(40px) + 여백
+  z-index: 60; // 앱 프레임(20)·태스크바(50) 위, 다이얼로그(150) 아래
+  width: 264px;
+  animation: popup-slide-in 400ms steps(6) both;
+}
+
+@keyframes popup-slide-in {
+  from {
+    transform: translateY(calc(100% + 56px));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.body {
+  @include flex($direction: column, $align: center, $gap: 8);
+  @include padding($x: 12, $y: 12);
+  font-family: 'Mona', monospace;
+  @include font($size: 13);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.headline {
+  color: var(--titlebar);
+  font-weight: 700;
+  animation: popup-blink 1s steps(1) infinite;
+}
+
+@keyframes popup-blink {
+  50% {
+    visibility: hidden;
+  }
+}
+
+.note {
+  @include font($size: 11);
+  color: var(--ink-dim);
+}

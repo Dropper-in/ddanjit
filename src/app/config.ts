@@ -72,7 +72,92 @@ export const APPS: AppEntry[] = [
   // },
 ];
 
-export type DialogState = { type: 'about' | 'shutdown' | 'spectrum' } | null;
+export type DialogState =
+  | { type: 'about' | 'shutdown' | 'spectrum' }
+  | { type: 'nag'; msg: NagMessage } // 준비중 아이콘 연타 이스터에그
+  | null;
+
+/** 준비중 아이콘 연타 잔소리 — body는 \n으로 줄바꿈 */
+export interface NagMessage {
+  title: string;
+  body: string;
+  note?: string;
+  button?: string; // 기본 '알겠어요'
+}
+
+// 발동 지점: 50회(고정 1), 100회(고정 2), 이후 50회마다 랜덤 풀
+export const NAG_THRESHOLD_1 = 50;
+export const NAG_THRESHOLD_2 = 100;
+export const NAG_REPEAT_EVERY = 50;
+
+export const NAG_FIXED: [NagMessage, NagMessage] = [
+  {
+    title: '준비중입니다',
+    body: '아무리 눌러도 빨리 안 나와요.',
+    note: '개발자가 지금 딴짓 중이거든요...',
+  },
+  {
+    title: '아직도 준비중입니다',
+    body: '...백 번이나 누르셨네요.\n그 끈기, 인정합니다.',
+    note: '일단 돌을 던지고 계세요.',
+    button: '...알겠어요',
+  },
+];
+
+export const NAG_RANDOM: NagMessage[] = [
+  {
+    title: '알림',
+    body: '여기를 눌러도 아무 일도 일어나지 않습니다.\n...방금 일어났네요.',
+    note: '이 창이 그 "아무 일"입니다.',
+    button: '얏호',
+  },
+  {
+    title: '집계 포기',
+    body: '몇 번째 클릭인지 세는 것도 지쳤습니다.',
+    note: '개발자보다 성실하시네요.',
+    button: '하하!',
+  },
+  {
+    title: '출시 안내',
+    body: '새로운 기능: 없음.\n출시일: 미정.\n당신의 클릭: 소중함.',
+    button: '어머♡',
+  },
+  {
+    title: '채용 공고',
+    body: '혹시... 여기서 일하실 생각 없나요?',
+    note: '급여: 없음 / 복지: 돌 던지기 무제한',
+    button: '사양할게요',
+  },
+  {
+    title: '추첨 결과',
+    body: '축하합니다!\n아무것도 당첨되지 않으셨습니다.',
+    button: '모잇카이',
+  },
+  {
+    title: '깨달음',
+    body: '이쯤 되면 이 팝업 창이 콘텐츠입니다.',
+    note: '즐기셨다면 성공입니다.',
+    button: '인정',
+  },
+  {
+    title: '소재 고갈',
+    body: '이제 더 나올 멘트가 없는데요?',
+    note: '진짜예요. 다음 건 재탕입니다.',
+    button: '뻔뻔하네',
+  },
+  {
+    title: '재방송',
+    body: '어? 이 멘트 아까 봤다구요?\n기분 탓입니다.',
+    note: '랜덤이란 게 원래 그런 거예요.',
+    button: '속아줄게요',
+  },
+  {
+    title: '개발자의 편지',
+    body: '여기서 50번을 더 누르면\n아주 놀라운 일이 벌어집니다!',
+    note: '이 창이 한 번 더 뜹니다.',
+    button: '그렇군요...',
+  },
+];
 
 const clockFmt = new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: '2-digit' });
 export function formatClock(date = new Date()): string {

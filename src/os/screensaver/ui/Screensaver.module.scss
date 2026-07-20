@@ -1,0 +1,34 @@
+@use 'mixins' as *;
+
+// 풀스크린 오버레이 — 테마 밖 존재(스크린세이버는 자체 팔레트로 튕김 색상 표현)
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  overflow: hidden;
+  background: #000;
+  cursor: none;
+}
+
+.logo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  @include flex($direction: column, $align: center, $gap: 8);
+  width: 96px;
+  color: #00ffea; // rAF에서 인라인 style.color로 매 튕김마다 갱신
+  will-change: transform;
+}
+
+.logoImg {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.logoText {
+  @include font($size: 16, $weight: 700);
+  font-family: 'Mona', monospace;
+  color: currentcolor;
+  white-space: nowrap;
+}

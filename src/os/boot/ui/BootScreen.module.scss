@@ -1,0 +1,69 @@
+@use 'mixins' as *;
+
+// 풀스크린 오버레이 — 테마 밖 존재(부팅 화면은 항상 검은 화면 + 초록 텍스트)
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  background: #000;
+  color: #33ff66;
+  font-family: 'Mona', monospace;
+  cursor: default;
+  user-select: none;
+  @include padding($all: 24);
+}
+
+.log {
+  @include flex($direction: column, $gap: 2);
+}
+
+.line {
+  @include font($size: 14);
+  white-space: pre-wrap;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  margin-top: 2px;
+  background: #33ff66;
+  animation: boot-cursor-blink 800ms steps(1) infinite;
+}
+
+@keyframes boot-cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.logo {
+  position: absolute;
+  inset: 0;
+  @include flex($direction: column, $align: center, $justify: center, $gap: 16);
+  animation: boot-logo-in 300ms ease-out both;
+}
+
+.logoImg {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+}
+
+.logoText {
+  @include font($size: 32, $letter-spacing: 2px);
+  font-family: 'Mona', monospace;
+  color: #fff;
+}
+
+@keyframes boot-logo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

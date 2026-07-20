@@ -6,6 +6,7 @@ export const ICONS_16 = {
   face: '/icons/16/face.png',
   file: '/icons/16/file.png',
   folder: '/icons/16/folder.png',
+  'fortune-cookie': '/icons/16/fortune-cookie.png',
   help: '/icons/16/help.png',
   maximize: '/icons/16/maximize.png',
   minimize: '/icons/16/minimize.png',

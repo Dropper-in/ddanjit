@@ -4,6 +4,7 @@ import type { AppDef } from '@/shared/types';
 // import { PaintApp } from '@/applications/paint';      // WIP
 // import { TangentArchive } from '@/applications/tangent'; // WIP
 import { StoneThrower } from '@/applications/stones';
+import { FortuneApp } from '@/applications/fortune';
 // import { BathApp } from '@/applications/bath';        // WIP — 배포 보류(코드 보존)
 
 export const SPECTRUMS = ['win98', 'cream', 'gameboy', 'crt', 'bubblegum', 'blueprint'] as const;
@@ -19,7 +20,7 @@ export const SPECTRUM_LABELS: Record<Spectrum, string> = {
 };
 
 /** 모든 앱 ID — WIP 포함. 활성화는 APPS 배열에서 관리. */
-export type AppId = 'stones' | 'paint' | 'tangent' | 'bath';
+export type AppId = 'stones' | 'paint' | 'tangent' | 'bath' | 'fortune';
 
 /** 앱 컴포넌트가 받을 수 있는 공통 props — 셸이 주입 */
 export interface AppComponentProps {
@@ -60,6 +61,14 @@ export const APPS: AppEntry[] = [
     description: '꼭 사랑하는 아이가 아니라도 괜찮습니다...',
     icon: iconUrl('stone'),
     component: StoneThrower,
+  },
+  {
+    id: 'fortune',
+    titleKo: '오늘의운세.exe',
+    titleEn: 'Fortune of the Day',
+    description: '과학적 근거는 없음',
+    icon: iconUrl('fortune-cookie'),
+    component: FortuneApp,
   },
   // WIP — 목욕 앱은 배포 보류 (코드/스토리는 보존). 다시 켜려면 주석 해제 + import 복구.
   // {

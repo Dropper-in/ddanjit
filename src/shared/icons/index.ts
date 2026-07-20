@@ -33,6 +33,7 @@ export const ICONS_16 = {
 /** 브랜드/캐릭터 전용 아이콘 — public/icons/brand/ */
 export const ICONS_BRAND = {
   'character-placeholder': '/icons/brand/character-placeholder.png',
+  'logo-favicon': '/icons/brand/logo-favicon.png',
   'logo-mark': '/icons/brand/logo-mark.png',
 } as const;
 

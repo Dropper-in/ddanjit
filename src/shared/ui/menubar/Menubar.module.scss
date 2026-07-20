@@ -11,7 +11,7 @@
 
 .item {
   @include padding($y: 5, $x: 12);
-  cursor: default;
+  cursor: pointer;
 
   &.open,
   &:hover {
@@ -41,7 +41,7 @@
   @include flex($align: center, $gap: 16);
   @include padding($top: 6, $bottom: 6, $left: 28, $right: 20);
   position: relative;
-  cursor: default;
+  cursor: pointer;
 
   &:hover {
     background: var(--select);
@@ -114,7 +114,7 @@
   @include flex($align: center, $gap: 6);
   width: 100%;
   min-width: 0;
-  cursor: default;
+  cursor: pointer;
   text-align: left;
   image-rendering: pixelated;
 

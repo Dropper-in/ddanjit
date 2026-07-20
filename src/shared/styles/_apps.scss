@@ -151,7 +151,7 @@
   font-family: 'Mona', monospace;
   font-size: 12px;
   color: var(--ink-dim);
-  cursor: default;
+  cursor: pointer;
   padding: 4px 8px;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -189,7 +189,7 @@
   box-shadow: var(--bevel-thin);
   border: 0;
   padding: 2px 8px;
-  cursor: default;
+  cursor: pointer;
 
   &.selected {
     box-shadow: var(--bevel-in);
@@ -283,7 +283,7 @@
   width: 18px;
   height: 18px;
   padding: 0;
-  cursor: default;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -32,7 +32,7 @@
 }
 
 .icon {
-  cursor: default;
+  cursor: pointer;
   user-select: none;
 
   &.comingSoon {
@@ -83,7 +83,8 @@
 }
 
 .labelKo {
-  padding: 1px 4px;
+  // 좌우 패딩 0 — "오늘의운세.exe"(92px)가 가용폭에 딱 걸쳐서 4px 패딩만으로도 줄바꿈됨
+  padding: 1px 0;
   text-shadow: 1px 1px 0 #000;
   overflow-wrap: anywhere;
   display: -webkit-box;

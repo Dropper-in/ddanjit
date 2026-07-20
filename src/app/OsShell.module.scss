@@ -19,6 +19,11 @@
   }
 }
 
+// 포커스된 앱 창 — 팝업광고(30) 위로 올라와 앞에 표시
+.appFrameFocused {
+  z-index: 40;
+}
+
 .appFrameNarrow {
   left: 0;
   right: 0;
@@ -61,5 +66,5 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  cursor: default;
+  cursor: pointer;
 }

@@ -1,13 +1,16 @@
 @use 'mixins' as *;
 
+// 중앙 정렬만 담당 — 클릭은 통과시켜 아래 창·작업표시줄이 눌리게 (모달 아님)
 .backdrop {
   position: absolute;
   inset: 0;
   z-index: 200;
+  pointer-events: none;
   @include flex($align: center, $justify: center);
 }
 
 .dialog {
+  pointer-events: auto;
   background: var(--chrome);
   box-shadow:
     var(--bevel-out),
@@ -51,6 +54,12 @@
   @include padding($x: 5);
   flex: 0 0 auto;
 
+  &.draggable {
+    cursor: move;
+    touch-action: none;
+    user-select: none;
+  }
+
   .title {
     flex: 1 1 auto;
     min-width: 0;
@@ -71,7 +80,7 @@
     padding: 0;
     flex: 0 0 24px;
     @include flex($align: center, $justify: center);
-    cursor: default;
+    cursor: pointer;
 
     &:active {
       box-shadow: var(--bevel-in);

@@ -25,6 +25,12 @@
     color: var(--chrome);
   }
 
+  // 드래그 가능한 창의 타이틀바 — 이동 가능함을 커서로 표시
+  &.draggable {
+    cursor: move;
+    touch-action: none; // 터치 드래그 시 스크롤/줌 제스처와 충돌 방지
+  }
+
   .icon {
     @include size($width: 20, $height: 20);
     image-rendering: pixelated;
@@ -50,7 +56,7 @@
     padding: 0;
     flex: 0 0 24px;
     @include flex($align: center, $justify: center);
-    cursor: default;
+    cursor: pointer;
 
     &:active {
       box-shadow: var(--bevel-in);

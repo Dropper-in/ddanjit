@@ -4,9 +4,9 @@
   position: fixed;
   right: 8px;
   bottom: 48px; // 태스크바(40px) + 여백
-  z-index: 60; // 앱 프레임(20)·태스크바(50) 위, 다이얼로그(150) 아래
+  z-index: 30; // 앱 프레임(20) 위, 태스크바(50) 아래 — 슬라이드 인도 태스크바 뒤로 지나감
   width: 264px;
-  animation: popup-slide-in 400ms steps(6) both;
+  animation: popup-slide-in 400ms ease-out both;
 }
 
 @keyframes popup-slide-in {

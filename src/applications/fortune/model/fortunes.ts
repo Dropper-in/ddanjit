@@ -2,6 +2,7 @@
 // 날짜(YYYYMMDD)를 해시해 풀에서 결정적으로 하나를 고른다. 같은 날 = 같은 운세.
 
 export interface Fortune {
+  id: string; // 공유 URL용 안정 ID — 본문과 하단 문구가 같으면 항상 같다
   text: string; // 운세 본문 (쪽지)
   note: string; // 하단 한 줄 — 너무 얽매이지 말라는 자조적 안내
 }
@@ -84,7 +85,6 @@ const FORTUNE_POOL: readonly string[] = [
   '크리티컬은 예고 없이 찾아옵니다',
 
   // 생활 팁
-  '매일 당근을 먹으면 암을 예방할 수 있어요',
   '배가 고플 때 중요한 결정을 내리지 마세요...',
   '당신의 척추가 자세 교정을 기다리고 있습니다',
   '고민은 배송만 늦출 뿐!',
@@ -270,16 +270,60 @@ function dateSeed(date: Date): number {
   return date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
 }
 
+/** 문자열 → 32비트 정수 (기기ID를 시드에 섞기 위함, FNV-1a 계열) */
+function hashString(s: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i += 1) {
+    h = Math.imul(h ^ s.charCodeAt(i), 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/** 본문과 하단 문구 조합의 내용 기반 ID — 배열 삽입·순서 변경에도 URL이 유지된다. */
+function fortuneId(text: string, note: string): string {
+  return `fortune-${hashString(text).toString(36)}-${hashString(note).toString(36)}`;
+}
+
+const FORTUNES_BY_ID = new Map<string, Fortune>();
+
+for (const text of FORTUNE_POOL) {
+  for (const note of FORTUNE_NOTES) {
+    const id = fortuneId(text, note);
+    if (FORTUNES_BY_ID.has(id)) {
+      throw new Error(`Duplicate fortune ID: ${id}`);
+    }
+    FORTUNES_BY_ID.set(id, { id, text, note });
+  }
+}
+
+function makeFortune(text: string, note: string): Fortune {
+  return FORTUNES_BY_ID.get(fortuneId(text, note)) as Fortune;
+}
+
+/** 공유 URL의 ID로 본문과 하단 문구를 함께 복원한다. */
+export function getFortuneById(id: string): Fortune | undefined {
+  return FORTUNES_BY_ID.get(id);
+}
+
 /**
  * 오늘(또는 지정 날짜)의 운세를 결정적으로 반환한다.
- * 본문과 하단 한 줄을 서로 다른 시드로 뽑아 하루 동안 고정.
- * 순수 함수 — Date 인자 외 부수효과 없음.
+ * 시드 = 날짜 ⊕ 기기ID → 날짜가 바뀌면 매일 다른 운세, 같은 날에도 기기마다 다른 운세.
+ * 본문과 하단 한 줄은 서로 다른 시드로 뽑아 하루 동안 고정.
+ * 순수 함수 — 인자 외 부수효과 없음.
  */
-export function getTodayFortune(date: Date = new Date()): Fortune {
-  const seed = dateSeed(date);
-  return {
-    text: FORTUNE_POOL[hashSeed(seed) % FORTUNE_POOL.length],
+export function getTodayFortune(date: Date = new Date(), deviceId = ''): Fortune {
+  const seed = dateSeed(date) ^ hashString(deviceId);
+  return makeFortune(
+    FORTUNE_POOL[hashSeed(seed) % FORTUNE_POOL.length],
     // 본문과 상관관계를 깨기 위해 시드를 섞어 별도 인덱스 파생
-    note: FORTUNE_NOTES[hashSeed(seed ^ 0x9e3779b9) % FORTUNE_NOTES.length],
-  };
+    FORTUNE_NOTES[hashSeed(seed ^ 0x9e3779b9) % FORTUNE_NOTES.length],
+  );
+}
+
+/** 보너스 재추첨 — 시드 무시하고 무작위로 하나. 순수하지 않음(Math.random). */
+export function getRandomFortune(): Fortune {
+  return makeFortune(
+    FORTUNE_POOL[Math.floor(Math.random() * FORTUNE_POOL.length)],
+    FORTUNE_NOTES[Math.floor(Math.random() * FORTUNE_NOTES.length)],
+  );
 }

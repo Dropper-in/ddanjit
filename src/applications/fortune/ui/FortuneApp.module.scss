@@ -136,3 +136,67 @@ $parchment: #f3e6c8;
   @include font($size: 13, $line-height: 1.7);
   margin: 0;
 }
+
+// 공유하고 한번 더 뽑기 — 채운 금색으로 강조
+.redrawBtn {
+  background: $gold;
+  border: 1px solid $gold;
+  color: #221240;
+  @include font($size: 12, $weight: 700);
+  @include padding($y: 6, $x: 16);
+  cursor: pointer;
+  transition: filter 0.2s;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+
+  &:disabled {
+    cursor: default;
+    filter: brightness(0.8);
+  }
+}
+
+.shareMenu {
+  position: absolute;
+  z-index: 1;
+  bottom: 18px;
+  left: 50%;
+  width: min(260px, calc(100% - 32px));
+  transform: translateX(-50%);
+  background: $parchment;
+  border: 2px solid $gold;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.45);
+  color: #2a1a10;
+  @include flex($direction: column, $gap: 6);
+  @include padding($all: 12);
+
+  p {
+    @include font($size: 12, $weight: 700);
+    margin: 0 0 2px;
+  }
+
+  button {
+    background: #f9f0da;
+    border: 1px solid $gold-dim;
+    color: #2a1a10;
+    @include font($size: 12);
+    @include padding($y: 5, $x: 8);
+    cursor: pointer;
+
+    &:hover {
+      background: $gold;
+    }
+  }
+
+  small {
+    @include font($size: 10, $line-height: 1.45);
+    color: #6b5639;
+    margin-top: 2px;
+  }
+}
+
+.shareCancel {
+  border-color: transparent !important;
+  color: #6b5639 !important;
+}

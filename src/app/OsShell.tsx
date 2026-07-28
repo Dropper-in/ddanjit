@@ -32,7 +32,6 @@ const BOOT_KEY = 'ddanjit.booted';
 
 export interface OsShellProps {
   initialAppId?: AppId;
-  initialFortuneId?: string;
   skipBoot?: boolean;
 }
 
@@ -54,7 +53,7 @@ function dialogTask(d: NonNullable<DialogState>): Task {
   }
 }
 
-export function OsShell({ initialAppId, initialFortuneId, skipBoot = false }: OsShellProps) {
+export function OsShell({ initialAppId, skipBoot = false }: OsShellProps) {
   const [openAppId, setOpenAppId] = useState<AppId | null>(initialAppId ?? null);
   const [startOpen, setStartOpen] = useState(false);
   const [dialog, setDialog] = useState<DialogState>(null);
@@ -190,16 +189,10 @@ export function OsShell({ initialAppId, initialFortuneId, skipBoot = false }: Os
   ].join(' ');
 
   const ActiveAppComponent = activeApp?.component as
-    | ComponentType<{ onExit?: () => void; fortuneId?: string }>
+    | ComponentType<{ onExit?: () => void }>
     | undefined;
   const activeAppContent =
-    activeApp && ActiveAppComponent ? (
-      activeApp.id === 'fortune' ? (
-        <ActiveAppComponent onExit={closeApp} fortuneId={initialFortuneId} />
-      ) : (
-        <ActiveAppComponent onExit={closeApp} />
-      )
-    ) : null;
+    activeApp && ActiveAppComponent ? <ActiveAppComponent onExit={closeApp} /> : null;
 
   return (
     <>

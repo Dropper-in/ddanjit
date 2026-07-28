@@ -1,4 +1,6 @@
 import { ImageResponse } from 'next/og';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { notFound } from 'next/navigation';
 import { getFortuneById } from '@/applications/fortune';
 
@@ -8,13 +10,10 @@ export const size = {
 };
 
 export const contentType = 'image/png';
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 // ImageResponse는 WOFF2를 읽지 못하므로, 카드 문구 글리프만 담은 Mona TTF를 사용한다.
-const mona12 = fetch(new URL('./Mona12Fortune.ttf', import.meta.url)).then((response) => {
-  if (!response.ok) throw new Error('Mona12 font could not be loaded');
-  return response.arrayBuffer();
-});
+const mona12 = readFile(join(process.cwd(), 'src', 'app', 'fortune', '[id]', 'Mona12Fortune.ttf'));
 
 type FortuneImageProps = {
   params: Promise<{ id: string }>;

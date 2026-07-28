@@ -87,6 +87,7 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     fortune && typeof window !== 'undefined'
       ? `${window.location.origin}/fortune/${fortune.id}`
       : '';
+  const shareMessage = shareUrl ? `${shareText}\n${shareUrl}` : shareText;
 
   // 단일 CTA: 모바일/지원 브라우저는 OS 공유 시트, 데스크탑은 X 공유 후 이 탭 복귀 시 보너스 지급.
   async function handleShareAndRedraw() {
@@ -94,7 +95,7 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     setSharing(true);
     try {
       if (typeof navigator.share === 'function') {
-        await navigator.share({ title: '딴짓.os 오늘의 운세', text: shareText, url: shareUrl });
+        await navigator.share({ title: '딴짓.os 오늘의 운세', text: shareMessage });
         if (!redrawUsed) grantRedraw();
         return;
       }
@@ -111,7 +112,7 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     setShareMenuOpen(false);
     setSharing(true);
     const popup = window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`,
       '_blank',
       'noopener,noreferrer',
     );
@@ -146,7 +147,7 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
   async function handleCopyShareLink() {
     if (!shareUrl) return;
     try {
-      await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+      await navigator.clipboard.writeText(shareMessage);
       setShareMenuOpen(false);
       if (!redrawUsed) grantRedraw();
     } catch {

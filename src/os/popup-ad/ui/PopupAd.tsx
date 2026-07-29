@@ -68,6 +68,7 @@ export function PopupAd({ onClaim, active, onFocus, onVisibilityChange }: PopupA
                 onClick={() => {
                   setClaimed(true);
                   onClaim();
+                  onFocus();
                 }}
               >
                 상품 받기

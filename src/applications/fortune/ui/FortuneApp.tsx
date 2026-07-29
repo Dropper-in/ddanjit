@@ -41,6 +41,7 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
   const [phase, setPhase] = useState<Phase>('idle');
   const [fortune, setFortune] = useState<Fortune | null>(null);
   const [redrawUsed, setRedrawUsed] = useState(false);
+  const [bonusDrawReady, setBonusDrawReady] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const shareCleanupRef = useRef<(() => void) | null>(null);
@@ -72,14 +73,23 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
 
   function handleReveal() {
     if (phase !== 'idle') return;
-    draw(() => getTodayFortune(new Date(), deviceId));
+    if (bonusDrawReady) {
+      setBonusDrawReady(false);
+      draw(getRandomFortune);
+      return;
+    }
+    const resolvedDeviceId = deviceId || loadDeviceId();
+    if (!deviceId) setDeviceId(resolvedDeviceId);
+    draw(() => getTodayFortune(new Date(), resolvedDeviceId));
   }
 
   // 공유 성공이 확인됐을 때만 호출 — 오늘 재추첨 소진 처리 후 보너스 운세
   function grantRedraw() {
     setRedrawUsed(true);
     localStorage.setItem(REDRAW_KEY, todayKey());
-    draw(getRandomFortune);
+    setBonusDrawReady(true);
+    setFortune(null);
+    setPhase('idle');
   }
 
   const shareText = fortune ? `🥠 딴짓.os 오늘의 운세\n“${fortune.text}”` : '';
@@ -193,39 +203,34 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
             <p className={styles.text}>{fortune.text}</p>
           </div>
           <p className={styles.hint}>{fortune.note}</p>
-          {!redrawUsed ? (
-            <>
+          <button
+            type="button"
+            className={styles.redrawBtn}
+            onClick={handleShareAndRedraw}
+            disabled={sharing}
+          >
+            {sharing ? '공유 중...' : redrawUsed ? 'SNS에 공유하기' : '공유하고 한 번 더 뽑기!'}
+          </button>
+          {shareMenuOpen && (
+            <div className={styles.shareMenu} role="dialog" aria-label="공유 방법 선택">
+              <p>어디에 공유할까요?</p>
+              <button type="button" onClick={handleTwitterShare}>
+                X에 공유
+              </button>
+              <button type="button" onClick={handleCopyShareLink}>
+                링크 복사
+              </button>
               <button
                 type="button"
-                className={styles.redrawBtn}
-                onClick={handleShareAndRedraw}
-                disabled={sharing}
+                className={styles.shareCancel}
+                onClick={() => setShareMenuOpen(false)}
               >
-                {sharing ? '공유 중...' : '공유하고 한 번 더 뽑기!'}
+                취소
               </button>
-              {shareMenuOpen && (
-                <div className={styles.shareMenu} role="dialog" aria-label="공유 방법 선택">
-                  <p>어디에 공유할까요?</p>
-                  <button type="button" onClick={handleTwitterShare}>
-                    X에 공유
-                  </button>
-                  <button type="button" onClick={handleCopyShareLink}>
-                    링크 복사
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.shareCancel}
-                    onClick={() => setShareMenuOpen(false)}
-                  >
-                    취소
-                  </button>
-                  <small>카카오톡·인스타 DM은 휴대폰 공유 메뉴에서 선택할 수 있어요.</small>
-                </div>
-              )}
-            </>
-          ) : (
-            <p className={styles.hint}>재추첨은 하루 한 번뿐! 내일 또 오세요</p>
+              <small>카카오톡·인스타 DM은 휴대폰 공유 메뉴에서 선택할 수 있어요.</small>
+            </div>
           )}
+          {redrawUsed && <p className={styles.hint}>재추첨은 하루 한 번뿐! 내일 또 오세요</p>}
         </>
       )}
     </div>

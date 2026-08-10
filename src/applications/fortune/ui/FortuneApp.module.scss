@@ -159,44 +159,105 @@ $parchment: #f3e6c8;
 
 .shareMenu {
   position: absolute;
-  z-index: 1;
-  bottom: 18px;
+  z-index: 2;
+  bottom: 14px;
   left: 50%;
-  width: min(260px, calc(100% - 32px));
+  width: min(310px, calc(100% - 32px));
   transform: translateX(-50%);
   background: $parchment;
-  border: 2px solid $gold;
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.45);
+  border: 1px solid $gold;
+  outline: 1px solid $gold-dim;
+  outline-offset: -5px;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.45);
   color: #2a1a10;
   @include flex($direction: column, $gap: 6);
-  @include padding($all: 12);
+  @include padding($all: 16);
 
-  p {
-    @include font($size: 12, $weight: 700);
-    margin: 0 0 2px;
+  h2 {
+    @include font($size: 15, $weight: 700);
+    margin: 4px 0 0;
   }
 
   button {
+    min-height: 31px;
     background: #f9f0da;
     border: 1px solid $gold-dim;
     color: #2a1a10;
     @include font($size: 12);
     @include padding($y: 5, $x: 8);
     cursor: pointer;
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.5);
 
     &:hover {
       background: $gold;
     }
-  }
 
-  small {
-    @include font($size: 10, $line-height: 1.45);
-    color: #6b5639;
-    margin-top: 2px;
+    &:focus-visible {
+      outline: 1px dashed #2a1a10;
+      outline-offset: -4px;
+    }
+
+    &:disabled {
+      cursor: default;
+      filter: brightness(0.85);
+    }
   }
 }
 
-.shareCancel {
+.shareLabel {
+  @include font($size: 9, $weight: 700);
+  color: $gold-dim;
+  letter-spacing: 1.5px;
+  margin: 0;
+}
+
+.shareDescription {
+  @include font($size: 11, $line-height: 1.45);
+  color: #6b5639;
+  margin: 0 0 3px;
+}
+
+.shareGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.sharePrimary {
+  background: $gold !important;
+  border-color: $gold !important;
+  @include font($weight: 700);
+}
+
+.moreButton {
+  align-self: center;
+  min-height: auto !important;
+  background: transparent !important;
   border-color: transparent !important;
+  box-shadow: none !important;
   color: #6b5639 !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.shareNotice {
+  @include font($size: 10, $line-height: 1.45);
+  border-top: 1px solid rgba(166, 138, 69, 0.55);
+  color: #6b5639;
+  margin: 2px 0 0;
+  padding-top: 6px;
+}
+
+.shareCancel {
+  align-self: center;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #6b5639 !important;
+}
+
+@media (max-width: 380px) {
+  .shareGrid {
+    grid-template-columns: 1fr;
+  }
 }

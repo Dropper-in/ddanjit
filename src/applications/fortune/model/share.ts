@@ -28,8 +28,8 @@ let kakaoScriptPromise: Promise<void> | null = null;
 
 export function createShareMessage(fortuneText: string, fortuneUrl: string): string {
   return fortuneUrl
-    ? `${SHARE_TITLE}\n“${fortuneText}”\n${fortuneUrl}`
-    : `${SHARE_TITLE}\n“${fortuneText}”`;
+    ? `${SHARE_TITLE}\n「${fortuneText}」\n${fortuneUrl}`
+    : `${SHARE_TITLE}\n「${fortuneText}」`;
 }
 
 export function createShareUrl(target: ShareTarget, message: string, url: string): string {

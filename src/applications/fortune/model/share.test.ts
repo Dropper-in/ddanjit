@@ -20,7 +20,7 @@ describe('createShareMessage', () => {
     const { createShareMessage } = await import('./share');
 
     expect(createShareMessage('좋은 일이 찾아와요.', 'https://ddanjit.os/fortune/1')).toBe(
-      '🥠 딴짓.os 오늘의 운세\n“좋은 일이 찾아와요.”\nhttps://ddanjit.os/fortune/1',
+      '🥠 딴짓.os 오늘의 운세\n「좋은 일이 찾아와요.」\nhttps://ddanjit.os/fortune/1',
     );
   });
 
@@ -28,7 +28,7 @@ describe('createShareMessage', () => {
     const { createShareMessage } = await import('./share');
 
     expect(createShareMessage('좋은 일이 찾아와요.', '')).toBe(
-      '🥠 딴짓.os 오늘의 운세\n“좋은 일이 찾아와요.”',
+      '🥠 딴짓.os 오늘의 운세\n「좋은 일이 찾아와요.」',
     );
   });
 });

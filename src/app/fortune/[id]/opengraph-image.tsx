@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
-import { headers } from 'next/headers';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { notFound } from 'next/navigation';
 import { getFortuneById } from '@/applications/fortune';
 
@@ -10,6 +11,8 @@ export const size = {
 
 export const contentType = 'image/png';
 export const runtime = 'nodejs';
+
+const mona12 = readFile(join(process.cwd(), 'public', 'fonts', 'Mona12Fortune.ttf'));
 
 type FortuneImageProps = {
   params: Promise<{ id: string }>;
@@ -27,13 +30,7 @@ export default async function FortuneImage({ params }: FortuneImageProps) {
 
   if (!fortune) notFound();
 
-  // 서버 번들에 포함되지 않는 소스 파일 대신 public 정적 폰트를 읽는다.
-  const requestHeaders = await headers();
-  const host = requestHeaders.get('x-forwarded-host') ?? requestHeaders.get('host');
-  const protocol = requestHeaders.get('x-forwarded-proto') ?? 'http';
-  const fontResponse = await fetch(`${protocol}://${host}/fonts/Mona12Fortune.ttf`);
-  if (!fontResponse.ok) throw new Error('포춘쿠키 카드 폰트를 불러오지 못했습니다.');
-  const font = await fontResponse.arrayBuffer();
+  const font = await mona12;
 
   return new ImageResponse(
     <div

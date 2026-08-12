@@ -5,12 +5,14 @@ const SHARE_TITLE = '🥠 딴짓.os 오늘의 운세';
 
 interface KakaoSdk {
   init(key: string): void;
+  isInitialized(): boolean;
   Share: {
     sendDefault(options: {
       objectType: 'feed';
       content: {
         title: string;
         description: string;
+        imageUrl: string;
         link: {
           mobileWebUrl: string;
           webUrl: string;
@@ -89,12 +91,15 @@ export async function shareToKakao(
       return 'unavailable';
     }
 
-    kakao.init(kakaoKey);
+    if (!kakao.isInitialized()) {
+      kakao.init(kakaoKey);
+    }
     kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
         title: SHARE_TITLE,
         description: message,
+        imageUrl: new URL('opengraph-image', `${url}/`).toString(),
         link: {
           mobileWebUrl: url,
           webUrl: url,

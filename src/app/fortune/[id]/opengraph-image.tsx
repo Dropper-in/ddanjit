@@ -1,6 +1,4 @@
 import { ImageResponse } from 'next/og';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 import { notFound } from 'next/navigation';
 import { getFortuneById } from '@/applications/fortune';
 
@@ -10,9 +8,12 @@ export const size = {
 };
 
 export const contentType = 'image/png';
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
-const mona12 = readFile(join(process.cwd(), 'public', 'fonts', 'Mona12Fortune.ttf'));
+const mona12 = fetch(new URL('./Mona12Fortune.ttf', import.meta.url)).then((response) => {
+  if (!response.ok) throw new Error('Mona12 font could not be loaded');
+  return response.arrayBuffer();
+});
 
 type FortuneImageProps = {
   params: Promise<{ id: string }>;
@@ -117,7 +118,7 @@ export default async function FortuneImage({ params }: FortuneImageProps) {
                 textAlign: 'center',
               }}
             >
-              “{fortune.text}”
+              {`「${fortune.text}」`}
             </div>
           </div>
         </div>

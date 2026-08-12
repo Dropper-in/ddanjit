@@ -79,9 +79,13 @@ describe('shareToKakao', () => {
   });
 
   it('SDK를 한 번만 불러오고 feed 형식으로 공유한다', async () => {
-    const init = vi.fn();
+    let initialized = false;
+    const init = vi.fn(() => {
+      initialized = true;
+    });
+    const isInitialized = vi.fn(() => initialized);
     const sendDefault = vi.fn();
-    const kakao = { init, Share: { sendDefault } };
+    const kakao = { init, isInitialized, Share: { sendDefault } };
     const appendChild = vi.fn((node: Node) => {
       const script = node as unknown as { onload: (() => void) | null };
       vi.stubGlobal('window', { Kakao: kakao });
@@ -106,12 +110,13 @@ describe('shareToKakao', () => {
     ).resolves.toEqual(['shared', 'shared']);
 
     expect(createElement).toHaveBeenCalledTimes(1);
-    expect(init).toHaveBeenCalledTimes(2);
+    expect(init).toHaveBeenCalledTimes(1);
     expect(sendDefault).toHaveBeenNthCalledWith(1, {
       objectType: 'feed',
       content: {
         title: '🥠 딴짓.os 오늘의 운세',
         description: '첫 번째 운세',
+        imageUrl: 'https://ddanjit.os/fortune/1/opengraph-image',
         link: {
           mobileWebUrl: 'https://ddanjit.os/fortune/1',
           webUrl: 'https://ddanjit.os/fortune/1',

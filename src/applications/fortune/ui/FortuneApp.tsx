@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cx } from '@/shared/lib/ui';
 import { getTodayFortune, getRandomFortune, type Fortune } from '../model/fortunes';
 import { createShareMessage, createShareUrl, shareToKakao, type ShareTarget } from '../model/share';
@@ -52,11 +52,11 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
   const [fortune, setFortune] = useState<Fortune | null>(null);
   const [redrawUsed, setRedrawUsed] = useState(false);
   const [bonusDrawReady, setBonusDrawReady] = useState(false);
+  const [bonusDrawAvailable, setBonusDrawAvailable] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [showMoreShareTargets, setShowMoreShareTargets] = useState(false);
   const [shareNotice, setShareNotice] = useState('');
-  const shareCleanupRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const today = new Date();
@@ -70,7 +70,6 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     );
     setDeviceId(loadDeviceId());
     if (localStorage.getItem(REDRAW_KEY) === todayKey(today)) setRedrawUsed(true);
-    return () => shareCleanupRef.current?.();
   }, []);
 
   useEffect(() => {
@@ -78,8 +77,6 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
-      shareCleanupRef.current?.();
-      shareCleanupRef.current = null;
       setSharing(false);
       setShareMenuOpen(false);
     };
@@ -110,13 +107,14 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     draw(() => getTodayFortune(new Date(), resolvedDeviceId));
   }
 
-  // 공유 성공이 확인됐을 때만 호출 — 오늘 재추첨 소진 처리 후 보너스 운세
-  function grantRedraw() {
+  function redeemBonusDraw() {
     setRedrawUsed(true);
     localStorage.setItem(REDRAW_KEY, todayKey());
     setBonusDrawReady(true);
+    setBonusDrawAvailable(false);
     setFortune(null);
     setPhase('idle');
+    setShareMenuOpen(false);
   }
 
   const shareUrl =
@@ -133,7 +131,7 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     try {
       if (useNativeShare) {
         await navigator.share({ title: '딴짓.os 오늘의 운세', text: shareMessage });
-        if (!redrawUsed) grantRedraw();
+        if (!redrawUsed) redeemBonusDraw();
         return;
       }
       setSharing(false);
@@ -147,35 +145,9 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     }
   }
 
-  function observeShareReturn() {
-    setSharing(true);
-    let leftPage = false;
-    let timeout = 0;
-    const onBlur = () => {
-      leftPage = true;
-    };
-    const onFocus = () => {
-      if (!leftPage) return;
-      shareCleanupRef.current?.();
-      shareCleanupRef.current = null;
-      setSharing(false);
-      if (!redrawUsed) grantRedraw();
-    };
-
-    shareCleanupRef.current = () => {
-      window.clearTimeout(timeout);
-      window.removeEventListener('blur', onBlur);
-      window.removeEventListener('focus', onFocus);
-    };
-    window.addEventListener('blur', onBlur, { once: true });
-    window.addEventListener('focus', onFocus);
-    timeout = window.setTimeout(() => {
-      if (!leftPage) {
-        shareCleanupRef.current?.();
-        shareCleanupRef.current = null;
-        setSharing(false);
-      }
-    }, 1000);
+  function offerBonusDraw() {
+    if (!redrawUsed) setBonusDrawAvailable(true);
+    setShareNotice('공유를 마쳤다면 보너스 쿠키를 열어보세요.');
   }
 
   function handleExternalShare(target: ShareTarget) {
@@ -184,16 +156,14 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     // 반환값으로 팝업 차단 여부를 판별하지 않는다.
     window.open(createShareUrl(target, shareMessage, shareUrl), '_blank', 'noopener,noreferrer');
 
-    setShareNotice('공유 창에서 게시를 마친 뒤 이 창으로 돌아오세요.');
-    observeShareReturn();
+    offerBonusDraw();
   }
 
   async function handleCopyShareLink() {
     if (!shareMessage || sharing) return;
     try {
       await navigator.clipboard.writeText(shareMessage);
-      setShareNotice('공유 창에서 게시를 마친 뒤 이 창으로 돌아오세요.');
-      observeShareReturn();
+      offerBonusDraw();
     } catch {
       // 권한 없는 HTTP 환경에서는 복사를 조용히 실패 처리한다.
     }
@@ -205,8 +175,8 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
     try {
       const result = await shareToKakao(shareMessage, shareUrl);
       if (result === 'shared') {
-        setShareNotice('공유 창에서 게시를 마친 뒤 이 창으로 돌아오세요.');
-        observeShareReturn();
+        setSharing(false);
+        offerBonusDraw();
         return;
       }
 
@@ -218,8 +188,6 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
   }
 
   function closeShareMenu() {
-    shareCleanupRef.current?.();
-    shareCleanupRef.current = null;
     setSharing(false);
     setShareMenuOpen(false);
   }
@@ -268,7 +236,7 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
             onClick={handleShareAndRedraw}
             disabled={sharing}
           >
-            {sharing ? '공유 중...' : redrawUsed ? 'SNS에 공유하기' : '공유하고 한 번 더 뽑기!'}
+            {sharing ? '공유 중...' : redrawUsed ? 'SNS에 공유하기' : '공유하고 쿠키 한 개 더 받기'}
           </button>
           {shareMenuOpen && (
             <div
@@ -344,6 +312,11 @@ export function FortuneApp({ onExit: _onExit }: { onExit?: () => void }) {
                     링크 복사
                   </button>
                 </div>
+              )}
+              {bonusDrawAvailable && (
+                <button type="button" className={styles.sharePrimary} onClick={redeemBonusDraw}>
+                  공유를 마쳤다면 보너스 쿠키 열기
+                </button>
               )}
               {shareNotice && <p className={styles.shareNotice}>{shareNotice}</p>}
               <button type="button" className={styles.shareCancel} onClick={closeShareMenu}>

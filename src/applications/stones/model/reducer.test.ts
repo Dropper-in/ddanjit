@@ -28,6 +28,7 @@ function makeProjectile(overrides: Partial<Projectile> = {}): Projectile {
   return {
     id: 0,
     type: STONE,
+    hit: false,
     phase: 'flight',
     frame: 0,
     flightFrames: 3,
@@ -99,7 +100,7 @@ describe('gameReducer', () => {
     it('충돌 시 impactSeq가 증가한다', () => {
       const state: GameState = {
         ...EMPTY_STATE,
-        projectiles: [makeProjectile({ frame: 2, flightFrames: 3 })],
+        projectiles: [makeProjectile({ frame: 2, flightFrames: 3, hit: true })],
       };
       const next = gameReducer(state, { type: 'tick', targetWidth: 320 });
       expect(next.impactSeq).toBe(1);
@@ -108,7 +109,7 @@ describe('gameReducer', () => {
     it('충돌 없으면 impactSeq 변화 없다', () => {
       const state: GameState = {
         ...EMPTY_STATE,
-        projectiles: [makeProjectile({ frame: 0, flightFrames: 3 })],
+        projectiles: [makeProjectile({ frame: 2, flightFrames: 3, hit: false })],
       };
       const next = gameReducer(state, { type: 'tick', targetWidth: 320 });
       expect(next.impactSeq).toBe(0);

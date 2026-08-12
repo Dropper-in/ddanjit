@@ -5,6 +5,7 @@ import styles from './Stones.module.scss';
 
 interface Props {
   targetRef: React.RefObject<HTMLDivElement>;
+  characterRef: React.RefObject<HTMLImageElement>;
   imgDims: { width: number; height: number };
   characterUrl: string;
   stuck: StuckItem[];
@@ -12,11 +13,12 @@ interface Props {
   reactionFrame: number;
   reactionExpr: string;
   showReaction: boolean;
-  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onTargetPointerDown: (e: React.PointerEvent<HTMLDivElement>) => void;
 }
 
 export function StageArea({
   targetRef,
+  characterRef,
   imgDims,
   characterUrl,
   stuck,
@@ -24,40 +26,33 @@ export function StageArea({
   reactionFrame,
   reactionExpr,
   showReaction,
-  onFileUpload,
+  onTargetPointerDown,
 }: Props) {
   return (
-    <label
-      className="st-stage"
-      title={characterUrl ? '클릭해서 제물 바꾸기' : '클릭해서 제물 올리기'}
-    >
-      <input type="file" accept="image/*" onChange={onFileUpload} hidden />
-      {characterUrl && (
-        <span className="st-stage-hint" aria-hidden="true">
-          클릭해서 제물 바꾸기
-        </span>
-      )}
+    <div className="st-stage">
       <div
         ref={targetRef}
         className="st-target"
+        data-wide={imgDims.width > imgDims.height || undefined}
         style={{ aspectRatio: `${imgDims.width}/${imgDims.height}` }}
+        onPointerDown={characterUrl ? onTargetPointerDown : undefined}
       >
         {characterUrl ? (
           <div key={reactionFrame} className={reactionFrame > 0 ? styles.wobbleHit : undefined}>
             <div className={reactionFrame > 0 ? styles.jellyChar : undefined}>
-              <img src={characterUrl} alt="목표" className="st-character" draggable={false} />
+              <img
+                src={characterUrl}
+                alt="목표"
+                className="st-character"
+                ref={characterRef}
+                style={{ cursor: 'crosshair' }}
+                draggable={false}
+              />
             </div>
           </div>
         ) : (
           <div className="st-placeholder">
-            <span className="st-placeholder-icon" aria-hidden="true">
-              +
-            </span>
-            <span className="st-placeholder-text">
-              클릭해서
-              <br />
-              제물 올리기
-            </span>
+            <span className="st-placeholder-text">제물 대기 중...</span>
           </div>
         )}
 
@@ -155,6 +150,6 @@ export function StageArea({
           </div>
         )}
       </div>
-    </label>
+    </div>
   );
 }

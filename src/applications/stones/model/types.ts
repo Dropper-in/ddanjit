@@ -14,6 +14,7 @@ export interface AmmoType {
 export interface Projectile {
   id: number;
   type: AmmoType;
+  hit: boolean;
   phase: 'flight' | 'bounce';
   frame: number; // 현재 애니메이션 프레임
   flightFrames: number; // 총 비행 프레임 수 (세기에 따라 결정)

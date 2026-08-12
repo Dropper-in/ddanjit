@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { Dialog } from '@/shared/ui/dialog';
 import styles from './Stones.module.scss';
 import { AMMO_TYPES, getReactions } from '../model/constants';
+import { isOpaquePixel } from '../model/hitTest';
 import { gameReducer } from '../model/reducer';
 import { useGifRecorder } from '../model/useGifRecorder';
 import type { FrameSnapshot } from '../model/types';
@@ -33,12 +34,14 @@ export function StoneThrower() {
   const { projectiles, stuck } = game;
 
   const targetRef = useRef<HTMLDivElement>(null);
+  const characterRef = useRef<HTMLImageElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const hiddenCanvasRef = useRef<HTMLCanvasElement>(null);
   const nextId = useRef(0);
   // 렌더 주기 밖에서 갱신되는 값 — snapshot에 넣으면 stale이라 개별 ref 유지
   const jellyStartRef = useRef(0);
-  const throwingRef = useRef(false);
   const imgDimsRef = useRef({ width: 512, height: 512 });
+  const imageDataRef = useRef<ImageData | null>(null);
 
   // 녹화 interval의 stale 클로저 방지용 렌더 스냅샷 — 매 렌더 한 번에 갱신
   const snapshotRef = useRef<FrameSnapshot>({
@@ -74,7 +77,6 @@ export function StoneThrower() {
     target: targetRef,
     snapshot: snapshotRef,
     imgDims: imgDimsRef,
-    throwing: throwingRef,
     jellyStart: jellyStartRef,
     jellyDuration: JELLY_DURATION,
     wobbleDuration: WOBBLE_DURATION,
@@ -129,7 +131,7 @@ export function StoneThrower() {
     return () => clearTimeout(shakeTimeout);
   }, [game.impactSeq]);
 
-  function fireAt(tx: number, ty: number) {
+  function fireAt(tx: number, ty: number, hit: boolean) {
     const rect = targetRef.current!.getBoundingClientRect();
     const ammo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId)!;
     // stage 너비 비례 — REF(512) 기준. 캐릭터(stage*0.7)와 같은 비율로 스케일.
@@ -139,6 +141,7 @@ export function StoneThrower() {
       projectile: {
         id: nextId.current++,
         type: ammo,
+        hit,
         phase: 'flight',
         frame: 0,
         flightFrames: Math.round(14 - Math.random() * 6),
@@ -159,49 +162,17 @@ export function StoneThrower() {
     setShotCount((count) => count + 1);
   }
 
-  function throwRandom() {
-    throwingRef.current = true;
-    setTimeout(() => {
-      throwingRef.current = false;
-    }, 150);
+  function handleTargetPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     const rect = targetRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const charSize = Math.min(rect.width, rect.height) * 0.7;
-    const charX0 = (rect.width - charSize) / 2;
-    const charY0 = (rect.height - charSize) / 2;
-    const charMargin = 0.12;
-    const xRange = charSize * (1 - charMargin * 2);
-    const yRange = charSize * (2 / 3 - charMargin);
-    const pick = () => ({
-      x: charX0 + charSize * charMargin + Math.random() * xRange,
-      y: charY0 + charSize * charMargin + Math.random() * yRange,
-    });
+    const characterRect = characterRef.current?.getBoundingClientRect();
+    const imageData = imageDataRef.current;
+    if (!rect || !characterRect || !imageData) return;
 
-    const ammo = AMMO_TYPES.find((a) => a.id === ammoId)!;
-    // 박힘 탄약: best-candidate로 기존 stuck과 가장 먼 위치 선택 (뭉침 방지)
-    if (ammo.sticks && stuck.length > 0) {
-      const CANDIDATES = 8;
-      let best = pick();
-      let bestDist = -1;
-      for (let i = 0; i < CANDIDATES; i++) {
-        const c = i === 0 ? best : pick();
-        let minD = Infinity;
-        for (const s of stuck) {
-          const dx = c.x - s.x,
-            dy = c.y - s.y;
-          const d = dx * dx + dy * dy;
-          if (d < minD) minD = d;
-        }
-        if (minD > bestDist) {
-          bestDist = minD;
-          best = c;
-        }
-      }
-      fireAt(best.x, best.y);
-      return;
-    }
-    const { x, y } = pick();
-    fireAt(x, y);
+    const tx = e.clientX - rect.left;
+    const ty = e.clientY - rect.top;
+    const imageX = ((e.clientX - characterRect.left) / characterRect.width) * imageData.width;
+    const imageY = ((e.clientY - characterRect.top) / characterRect.height) * imageData.height;
+    fireAt(tx, ty, isOpaquePixel(imageData, imageX, imageY));
   }
 
   function reset() {
@@ -292,7 +263,9 @@ export function StoneThrower() {
       cvs.width = width;
       cvs.height = height;
       // 크롭은 다운스케일 스캔본이 아니라 원본 이미지에서 (환산 좌표 기준)
-      cvs.getContext('2d')!.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, width, height);
+      const context = cvs.getContext('2d')!;
+      context.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, width, height);
+      imageDataRef.current = context.getImageData(0, 0, width, height);
       imgDimsRef.current = { width, height };
       setImgDims({ width, height });
       cvs.toBlob(
@@ -320,6 +293,7 @@ export function StoneThrower() {
 
   return (
     <div className="st-app">
+      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} hidden />
       <canvas ref={hiddenCanvasRef} style={{ display: 'none' }} />
       {gifUrl && <GifPreviewDialog gifUrl={gifUrl} onClose={closeGif} />}
       {uploadError && (
@@ -345,6 +319,7 @@ export function StoneThrower() {
 
       <StageArea
         targetRef={targetRef}
+        characterRef={characterRef}
         imgDims={imgDims}
         characterUrl={characterUrl}
         stuck={stuck}
@@ -352,25 +327,15 @@ export function StoneThrower() {
         reactionFrame={reactionFrame}
         reactionExpr={reactionExpr}
         showReaction={showReaction}
-        onFileUpload={handleFileUpload}
+        onTargetPointerDown={handleTargetPointerDown}
       />
 
       <div className="st-action-bar">
         <Button onClick={reset}>
           <img src={iconUrl('tool-eraser')} width="16" height="16" alt="" /> 초기화
         </Button>
-        <Button
-          className="st-throw"
-          onClick={throwRandom}
-          disabled={!characterUrl}
-          title={!characterUrl ? '제물을 먼저 올려주세요' : undefined}
-        >
-          {ammo.emoji ? (
-            <span style={{ fontSize: 20, lineHeight: 1 }}>{ammo.emoji}</span>
-          ) : (
-            <img src={ammo.icon} width="20" height="20" alt="" />
-          )}
-          {ammo.label} 던지기 ↑
+        <Button className="st-throw" onClick={() => fileInputRef.current?.click()}>
+          {characterUrl ? '제물 변경하기' : '제물 올리기'}
         </Button>
         <Button
           className={recording ? 'is-recording' : undefined}
@@ -384,7 +349,8 @@ export function StoneThrower() {
       </div>
 
       <div className="st-hint">
-        <b>{ammo.label}</b>이(가) {ammo.sticks ? '날아가 박힙니다' : '날아갑니다'}
+        클릭/터치한 위치로 <b>{ammo.label}</b>이(가){' '}
+        {ammo.sticks ? '날아가 박힙니다' : '날아갑니다'}
         {encoding && (
           <span style={{ marginLeft: 12, color: 'var(--ink-dim)' }}>
             · GIF 인코딩 중 {encodingPct}%

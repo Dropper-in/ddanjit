@@ -26,7 +26,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           if (projectile.frame < projectile.flightFrames - 1) {
             next.push({ ...projectile, frame: projectile.frame + 1 });
           } else {
-            didImpact = true;
+            didImpact ||= projectile.hit;
             if (projectile.type.sticks) {
               newStuck.push({
                 id: projectile.id,

@@ -89,7 +89,6 @@ export type GifRecorderRefs = {
   snapshot: React.MutableRefObject<FrameSnapshot>;
   // 렌더 주기 밖에서 갱신되는 값들은 개별 ref로 유지 (snapshot에 넣으면 stale)
   imgDims: React.MutableRefObject<{ width: number; height: number }>;
-  throwing: React.MutableRefObject<boolean>;
   jellyStart: React.MutableRefObject<number>;
   jellyDuration: number;
   wobbleDuration: number;
@@ -104,7 +103,7 @@ function drawFrame(
   imgCache: Map<string, CanvasImageSource>,
   theme: ThemeSnapshot,
 ) {
-  const { imgDims, throwing, jellyStart, target } = refs;
+  const { imgDims, jellyStart, target } = refs;
   const { game, shake, reactionFrame, characterUrl, shotCount, ammoId, showReaction } =
     refs.snapshot.current;
   const { width: rawWidth, height: rawHeight } = imgDims.current;
@@ -327,24 +326,19 @@ function drawFrame(
   ctx.fillStyle = bevelXlo;
   ctx.fillRect(footerX, footerY, imgWidth, 1);
 
-  const curAmmo = AMMO_TYPES.find((ammoType) => ammoType.id === ammoId)!;
   const FONT_SIZE = 14;
-  const ICON_SIZE = 18;
-  const isPressed = throwing.current;
   ctx.font = `bold ${FONT_SIZE}px Mona, monospace`;
-  const ammoImg = curAmmo.emoji ? null : imgCache.get(curAmmo.icon);
-  const buttonLabel = `${curAmmo.label} 던지기 →`;
-  const hasAmmoIcon = !!(ammoImg || curAmmo.emoji);
-  const labelWidth = ctx.measureText(buttonLabel).width + (hasAmmoIcon ? ICON_SIZE + 6 : 0);
+  const buttonLabel = '제물 변경하기';
+  const labelWidth = ctx.measureText(buttonLabel).width;
   const buttonPadding = 10;
   const buttonWidth = labelWidth + buttonPadding * 2;
   const buttonHeight = GIF_FOOTER_H - 12;
   const buttonX = footerX + 8;
   const buttonY = footerY + 6;
-  const pressOffset = isPressed ? 1 : 0;
+  const pressOffset = 0;
   ctx.fillStyle = chrome;
   ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
-  const [bevelTopLeft, bevelBottomRight] = isPressed ? [bevelLo, bevelHi] : [bevelHi, bevelLo];
+  const [bevelTopLeft, bevelBottomRight] = [bevelHi, bevelLo];
   ctx.fillStyle = bevelTopLeft;
   ctx.fillRect(buttonX, buttonY, buttonWidth, 2);
   ctx.fillRect(buttonX, buttonY, 2, buttonHeight);
@@ -354,19 +348,8 @@ function drawFrame(
   ctx.fillStyle = ink;
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
-  let buttonContentX = buttonX + buttonPadding + pressOffset;
+  const buttonContentX = buttonX + buttonPadding + pressOffset;
   const buttonContentY = buttonY + buttonHeight / 2 + pressOffset;
-  if (curAmmo.emoji) {
-    const emojiImg = imgCache.get(`emoji:${curAmmo.emoji}`);
-    if (emojiImg) {
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(emojiImg, buttonContentX, buttonContentY - ICON_SIZE / 2, ICON_SIZE, ICON_SIZE);
-    }
-    buttonContentX += ICON_SIZE + 6;
-  } else if (ammoImg) {
-    ctx.drawImage(ammoImg, buttonContentX, buttonContentY - ICON_SIZE / 2, ICON_SIZE, ICON_SIZE);
-    buttonContentX += ICON_SIZE + 6;
-  }
   ctx.fillText(buttonLabel, buttonContentX, buttonContentY);
 
   const statsText = `${shotCount}회 던짐`;

@@ -18,7 +18,11 @@ export async function generateMetadata({ params }: FortunePageProps): Promise<Me
     };
   }
 
-  const imageUrl = `/fortune/${encodeURIComponent(fortune.id)}/opengraph-image`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.ddanjit.today';
+  const imageUrl = new URL(
+    `/fortune/${encodeURIComponent(fortune.id)}/opengraph-image`,
+    siteUrl,
+  ).toString();
   const title = '🥠 오늘의 포춘쿠키 | 딴짓.os';
 
   return {
